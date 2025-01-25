@@ -54,7 +54,6 @@ def _cv_lines(
 ):
     color = tuple(color)
     line_type = cv.LINE_AA if antialias else cv.LINE_8
-    overlay = surf_array.copy()
     pad_left = -min(0, min(point[0] for point in points))
     pad_right = max(0, max(point[0] - surf_array.shape[0] for point in points))
     pad_top = -min(0, min(point[1] for point in points))
@@ -64,6 +63,7 @@ def _cv_lines(
     ),
         mode='constant',
         constant_values=((0, 0), (0, 0), (0, 0)))
+    overlay = padded_array.copy()
     points = np.array([[point[0] - pad_left, point[1] - pad_top] for point in points], np.int32)
     points = points.reshape((-1, 1, 2))  # Shape it into (n, 1, 2)
     cv.polylines(padded_array, [points], closed, color, thickness, line_type, 0)
@@ -154,3 +154,12 @@ def line(surface: Surface, p1: tuple[int, int], p2: tuple[int, int], color: Colo
     p1 = p1[0] - left, p1[1] - top
     p2 = p2[0] - left, p2[1] - top
     return _cv_line(surface, rect, p1 = p1, p2 = p2, color=color, thickness=thickness, antialias=antialias)
+
+def lines(surface: Surface, points: list[tuple[int, int]], color: Color, thickness: int, antialias: bool, closed: bool):
+    left = min(point[0] for point in points) - thickness//2
+    right = max(point[0] for point in points) + thickness//2 +1
+    top = min(point[1] for point in points) - thickness//2
+    bottom = max(point[1] for point in points) + thickness//2 + 1
+    rect = Rect(left, top, right - left, bottom - top)
+    points = [[point[0] - left, point[1] - top] for point in points]
+    return _cv_lines(surface, rect, points=points, color=color, thickness=thickness, antialias=antialias, closed=closed)
