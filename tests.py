@@ -50,6 +50,38 @@ def test_ellipse(save_dir):
     image.save(img, os.path.join(save_dir, "ellipses.png"))
     image.save(img_alpha, os.path.join(save_dir, "ellipses_alpha.png"))
 
+def test_arc(save_dir):
+    img, img_alpha = init(save_dir)
+    img = arc(img, (100, 200), 100, 100, (255, 255, 0, 255), 50, True, 0, 0, 100)
+    img = arc(img, (200, 100), 100, 50, (255, 0, 0, 255), 0, False, -30, 0, 200)
+    img = arc(img, (300, 300), 70, 10, (0, 255, 0, 255), 20, False, 45, -10, -100)
+    img = arc(img, (400, 150), 100, 0, (255, 0, 255, 255), 0, True, 0, 0, 360)
+
+    img_alpha = arc(img_alpha, (100, 200), 100, 100, (255, 255, 0, 125), 50, True, 0, 0, 100)
+    img_alpha = arc(img_alpha, (200, 100), 100, 50, (255, 0, 0, 255), 0, False, -30, 0, 200)
+    img_alpha = arc(img_alpha, (300, 300), 70, 10, (0, 255, 0, 255), 20, False, 45, -10, -100)
+    img_alpha = arc(img_alpha, (400, 150), 100, 0, (255, 0, 255, 100), 0, True, 0, 0, 360)
+
+    image.save(img, os.path.join(save_dir, "arcs.png"))
+    image.save(img_alpha, os.path.join(save_dir, "arcs_alpha.png"))
+
+def test_pie(save_dir):
+    img, img_alpha = init(save_dir)
+    img = pie(img, (100, 200), 100, 100, (255, 255, 0, 255), 50, True, 0, 0, 100)
+    img = pie(img, (200, 100), 100, 50, (255, 0, 0, 255), 0, False, -30, 0, 200)
+    img = pie(img, (300, 300), 70, 10, (0, 255, 0, 255), 20, False, 45, -10, -100)
+    img = pie(img, (400, 150), 100, 0, (255, 0, 255, 255), 0, True, 0, 0, 360)
+
+    img_alpha = pie(img_alpha, (100, 200), 100, 100, (255, 255, 0, 125), 50, True, 0, 0, 100)
+    img_alpha = pie(img_alpha, (200, 100), 100, 50, (255, 0, 0, 255), 0, False, -30, 0, 200)
+    img_alpha = pie(img_alpha, (300, 300), 70, 10, (0, 255, 0, 255), 20, False, 45, -10, -100)
+    img_alpha = pie(img_alpha, (400, 150), 100, 0, (255, 0, 255, 100), 0, True, 0, 0, 360)
+
+    image.save(img, os.path.join(save_dir, "pies.png"))
+    image.save(img_alpha, os.path.join(save_dir, "pies_alpha.png"))
+
 save_dir = "test_results"
-#test_circle(save_dir)
-test_ellipse(save_dir)
+# test_circle(save_dir)
+# test_ellipse(save_dir)
+test_arc(save_dir)
+test_pie(save_dir)

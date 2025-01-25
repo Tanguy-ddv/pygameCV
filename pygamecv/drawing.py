@@ -1,15 +1,16 @@
 """The art._drawing submodule contains functions to draw something on an Art."""
 
 import numpy as np
-from pygame import Surface, draw, gfxdraw, Color
+from pygame import Surface, Color
 import cv2 as cv
 from .decorator import cv_transformation
-from .common import get_ellipse_rect, polygon_points_from_line, start_stop_arc
+from .common import get_ellipse_rect, start_stop_arc
 
 @cv_transformation
 def _cv_circle(surf_array: np.ndarray, center: tuple[int, int], radius: int, color: Color, thickness: int, antialias):
     line_type = cv.LINE_AA if antialias else cv.LINE_8
     cv.circle(surf_array, center, radius, tuple(color), thickness, line_type, 0)
+    return surf_array
 
 @cv_transformation
 def _cv_ellipse(
@@ -23,46 +24,79 @@ def _cv_ellipse(
 ):
     line_type = cv.LINE_AA if antialias else cv.LINE_8
     cv.ellipse(surf_array, center, (radius_x, radius_y), angle, start_angle, end_angle, tuple(color), thickness, line_type, 0)
+    return surf_array
 
-def line(surface: Surface, p1: tuple[int, int], p2: tuple[int, int], color: Color, thickness: int, antialias: bool):
-    if antialias:
-        points = polygon_points_from_line(p1, p2, thickness)
-        gfxdraw.aapolygon(surface, points, color)
-        gfxdraw.filled_polygon(surface, points, color)
-    else:
-        draw.line(surface, color, p1, p2, thickness)
-    return surface
+@cv_transformation
+def _cv_line(
+    surf_array: np.ndarray,
+    p1: tuple[int, int],
+    p2: tuple[int, int],
+    color: Color,
+    thickness: int,
+    antialias: bool
+):
+    color = tuple(color)
+    line_type = cv.LINE_AA if antialias else cv.LINE_8
+    overlay = surf_array.copy()
+    cv.line(surf_array, p1, p2, tuple(color), thickness, line_type, 0)
+    if len(color) == 4:
+        alpha = color[3]
+        cv.addWeighted(surf_array, alpha/255, overlay, 1 - alpha/255, 0, surf_array)
+    
+@cv_transformation
+def _cv_lines(
+    surf_array: np.ndarray,
+    points: list[tuple[int, int]],
+    color: Color,
+    thickness: int,
+    antialias: bool,
+    closed: bool
+):
+    color = tuple(color)
+    line_type = cv.LINE_AA if antialias else cv.LINE_8
+    overlay = surf_array.copy()
+    pad_left = -min(0, min(point[0] for point in points))
+    pad_right = max(0, max(point[0] - surf_array.shape[0] for point in points))
+    pad_top = -min(0, min(point[1] for point in points))
+    pad_bottom = max(0, max(point[1] - surf_array.shape[1] for point in points))
+    padded_array = np.pad(surf_array, (
+        (pad_left, pad_right), (pad_top, pad_bottom), (0, 0)
+    ),
+        mode='constant',
+        constant_values=((0, 0), (0, 0), (0, 0)))
+    points = np.array([[point[0] - pad_left, point[1] - pad_top] for point in points], np.int32)
+    points = points.reshape((-1, 1, 2))  # Shape it into (n, 1, 2)
+    cv.polylines(padded_array, [points], closed, color, thickness, line_type, 0)
+
+    if len(color) == 4:
+        alpha = color[3]
+        cv.addWeighted(padded_array, alpha/255, overlay, 1 - alpha/255, 0, padded_array)
+    surf_array[:, :, :] = padded_array[pad_left: padded_array.shape[0]-pad_right, pad_top: padded_array.shape[1] - pad_bottom]
 
 def circle(surface: Surface, center: tuple[int, int], radius: int, color: Color, thickness: int, antialias: bool):
-    color = Color(color)
-    if antialias or (surface.get_alpha() and color.a != 255):
-        rect = get_ellipse_rect(center, radius, radius, thickness, 0)
-        center = radius + thickness//2, radius + thickness//2
-        return _cv_circle(surface, rect=rect, center=center, radius=radius, color=tuple(color), thickness=thickness if thickness else -1, antialias=antialias)
-    else:
-        draw.circle(surface, color, center, radius, thickness)
+    if radius <= 1:
         return surface
+    color = tuple(color)
+    rect = get_ellipse_rect(center, radius, radius, thickness, 0)
+    center = radius + thickness//2, radius + thickness//2
+    return _cv_circle(surface, rect=rect, center=center, radius=radius, color=color, thickness=thickness if thickness else -1, antialias=antialias)
 
 def ellipse(surface: Surface, center: tuple[int, int], radius_x: int, radius_y: int, color: Color, thickness: int, antialias: bool, angle: int = 0):
     if radius_x <= 0 or radius_y <= 0:
         return surface
     rect = get_ellipse_rect(center, radius_x, radius_y, thickness, angle)
-    color = Color(color)
-    if antialias or angle or (surface.get_alpha() and color.a != 255):
-        center = rect.width//2, rect.height//2
-        return _cv_ellipse(
-            surface,
-            rect,
-            center=center,
-            radius_x=radius_x, radius_y=radius_y,
-            color=color,
-            thickness=thickness if thickness else -1,
-            angle=angle, start_angle=0, end_angle=360,
-            antialias=antialias
-        )
-    else:
-        draw.ellipse(surface, color, rect, thickness)
-        return surface
+    color = tuple(color)
+    center = rect.width//2, rect.height//2
+    return _cv_ellipse(
+        surface,
+        rect,
+        center=center,
+        radius_x=radius_x, radius_y=radius_y,
+        color=color,
+        thickness=thickness if thickness else -1,
+        angle=angle, start_angle=0, end_angle=360,
+        antialias=antialias
+    )
 
 def arc(
     surface: Surface,
@@ -77,21 +111,18 @@ def arc(
     end_angle: int
 ):
     rect = get_ellipse_rect(center, radius_x, radius_y, thickness, angle)
-    if antialias or thickness == 0 or angle or (surface.get_alpha() and color.a != 255):
-        color = Color(color)
-        center = radius_x + thickness//2, radius_y + thickness//2
-        return _cv_ellipse(
-            surface,
-            rect,
-            center=center,
-            radius_x=radius_x, radius_y=radius_y,
-            color=color,
-            thickness=thickness if thickness else -1,
-            angle=angle, start_angle=start_angle, end_angle=end_angle,
-            antialias=antialias
-        )
-    else:
-        draw.arc(surface, color, rect, start_angle, end_angle, thickness)
+    color = tuple(color)
+    center = rect.width//2, rect.height//2
+    return _cv_ellipse(
+        surface,
+        rect,
+        center=center,
+        radius_x=radius_x, radius_y=radius_y,
+        color=color,
+        thickness=thickness if thickness else -1,
+        angle=angle, start_angle=start_angle, end_angle=end_angle,
+        antialias=antialias
+    )
 
 def pie(
     surface: Surface,
@@ -105,12 +136,9 @@ def pie(
     start_angle: int,
     end_angle: int
 ):
-    rect = get_ellipse_rect(center, radius_x, radius_y, thickness, angle)
-    color = tuple(color)
-    if thickness == 0:
-        return _cv_ellipse(surface, rect, radius_x=radius_x, radius_y=radius_x, color=color, thickness=0, antialias=antialias, start_angle=start_angle, end_angle=end_angle)
+    if thickness:
+        delta = 6//(antialias+1)
+        points = list(cv.ellipse2Poly(center, (radius_x, radius_y), angle, start_angle, end_angle, delta)) + [np.array(center).astype(np.int32)]
+        return _cv_lines(surface, points=points, color=color, thickness=thickness, antialias=antialias, closed=True)
     else:
-        arc =  _cv_ellipse(surface, rect, radius_x=radius_x, radius_y=radius_x, color=color, thickness=thickness, antialias=antialias, start_angle=start_angle, end_angle=end_angle)
-        p1, p2 = start_stop_arc(rect.center, radius_x, radius_y, start_angle, end_angle, angle)
-        half_pie = line(arc, rect.center, p1, color, thickness)
-        return line(half_pie, rect.center, p2, color, thickness)
+        return arc(surface, center, radius_x, radius_y, color, thickness, antialias, angle, start_angle, end_angle)
