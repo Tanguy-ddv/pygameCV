@@ -1,6 +1,6 @@
 
 from pygamecv.drawing import circle, ellipse, arc, pie
-from pygame import image, display
+from pygame import image, display, draw
 import os
 
 def init(save_dir):
@@ -31,5 +31,25 @@ def test_circle(save_dir):
     image.save(img, os.path.join(save_dir, "circles.png"))
     image.save(img_alpha, os.path.join(save_dir, "circles_alpha.png"))
 
+def test_ellipse(save_dir):
+    img, img_alpha = init(save_dir)
+    img = ellipse(img, (100, 200), 100, 100, (255, 255, 0, 255), 50, True, 0)
+    img = ellipse(img, (200, 100), 100, 50, (255, 0, 0, 255), 0, False, -30)
+    img = ellipse(img, (300, 300), 70, 10, (0, 255, 0, 255), 50, False, 45)
+    img = ellipse(img, (400, 150), 100, 0, (255, 0, 255, 255), 0, True)
+    img = ellipse(img, (0, 0), 100, 100, (0, 255, 255, 255), 50, True)
+    img = ellipse(img, (500, 500), 100, 200, (0, 255, 255, 255), 50, True)
+
+    img_alpha = ellipse(img_alpha, (100, 200), 100, 100, (255, 255, 0, 255), 50, True, 0)
+    img_alpha = ellipse(img_alpha, (200, 100), 100, 50, (255, 0, 0, 255), 0, False, -30)
+    img_alpha = ellipse(img_alpha, (300, 300), 70, 10, (0, 255, 0, 100), 50, False, 45)
+    img_alpha = ellipse(img_alpha, (400, 150), 100, 0, (255, 0, 255, 255), 0, True)
+    img_alpha = ellipse(img_alpha, (0, 0), 100, 100, (0, 255, 255, 255), 50, True)
+    img_alpha = ellipse(img_alpha, (500, 500), 100, 200, (0, 255, 255, 125), 50, True)
+
+    image.save(img, os.path.join(save_dir, "ellipses.png"))
+    image.save(img_alpha, os.path.join(save_dir, "ellipses_alpha.png"))
+
 save_dir = "test_results"
-test_circle(save_dir)
+#test_circle(save_dir)
+test_ellipse(save_dir)
