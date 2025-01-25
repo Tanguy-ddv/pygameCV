@@ -1,10 +1,9 @@
-
+"""The decorator module contains the cv_transformation decorator, used to transform an in-place open-cv2 array transformation."""
 from typing import Callable
 from functools import wraps
 import numpy as np
-from pygame import Surface, surfarray as sa, image, pixelcopy, SRCALPHA, Rect, draw
+from pygame import Surface, surfarray as sa, Rect
 from .common import make_surface_rgba
-
 
 def cv_transformation(func: Callable[[np.ndarray], None]):
     """Decorate a function to make it like a basic inplace surface transformation while it uses cv's format."""
@@ -14,8 +13,22 @@ def cv_transformation(func: Callable[[np.ndarray], None]):
         if rect is None:
             subsurf = surface
         else:
-            subsurf = surface.subsurface(rect.clip(surface.get_rect()))
-        
+            if not rect.colliderect(surface.get_rect()):
+                return surface
+
+            if surface.get_rect().contains(rect):
+                subsurf = surface.subsurface(rect)
+            
+            else:
+                subsurf = Surface(rect.size)
+                subsurf.fill((0, 0, 0))
+
+                surface_rect = surface.get_rect()
+                overlap_rect = rect.clip(surface_rect)
+
+                target_position = overlap_rect.left - rect.left, overlap_rect.top - rect.top
+                subsurf.blit(surface, target_position, overlap_rect)
+
         if surface.get_alpha() is None: # the image does not have any alpha channel.
             array_surf = np.ascontiguousarray((sa.pixels3d(subsurf)).swapaxes(1, 0))
             func(array_surf, **kwargs)
@@ -30,7 +43,7 @@ def cv_transformation(func: Callable[[np.ndarray], None]):
 
         if rect is None:
             return new_surf
-        
+
         surface.blit(new_surf, rect)
         return surface
     
