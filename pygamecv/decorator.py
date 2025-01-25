@@ -2,13 +2,15 @@
 from typing import Callable
 from functools import wraps
 import numpy as np
-from pygame import Surface, surfarray as sa, Rect
+from pygame import Surface, surfarray as sa, Rect, SRCALPHA
 from .common import make_surface_rgba
 
 def cv_transformation(func: Callable[[np.ndarray], None]):
     """Decorate a function to make it like a basic inplace surface transformation while it uses cv's format."""
     @wraps(func)
     def wrapper_cv(surface: Surface, rect: Rect = None, **kwargs):
+
+        alpha = surface.get_alpha()
 
         if rect is None:
             subsurf = surface
@@ -20,8 +22,8 @@ def cv_transformation(func: Callable[[np.ndarray], None]):
                 subsurf = surface.subsurface(rect)
             
             else:
-                subsurf = Surface(rect.size)
-                subsurf.fill((0, 0, 0))
+                subsurf = Surface(rect.size, 0 if alpha is None else SRCALPHA)
+                subsurf.fill((0, 0, 0, 0))
 
                 surface_rect = surface.get_rect()
                 overlap_rect = rect.clip(surface_rect)
@@ -29,12 +31,13 @@ def cv_transformation(func: Callable[[np.ndarray], None]):
                 target_position = overlap_rect.left - rect.left, overlap_rect.top - rect.top
                 subsurf.blit(surface, target_position, overlap_rect)
 
-        if surface.get_alpha() is None: # the image does not have any alpha channel.
+        if alpha is None: # the image does not have any alpha channel.
             array_surf = np.ascontiguousarray((sa.pixels3d(subsurf)).swapaxes(1, 0))
             func(array_surf, **kwargs)
             new_surf = sa.make_surface(array_surf.swapaxes(1, 0))
         else:
             # Convert the surface in open cv's format, taking the alpha channel into account.
+            subsurf = subsurf.convert_alpha()
             array_surf = np.ascontiguousarray(np.dstack((sa.pixels3d(subsurf), sa.pixels_alpha(subsurf))).swapaxes(1, 0))
             # Call the function
             func(array_surf, **kwargs)
