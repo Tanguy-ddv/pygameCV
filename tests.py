@@ -1,5 +1,5 @@
 
-from pygamecv.drawing import circle, ellipse, arc, pie
+from pygamecv.drawing import circle, ellipse, arc, pie, line
 from pygame import image, display, draw
 import os
 
@@ -80,8 +80,24 @@ def test_pie(save_dir):
     image.save(img, os.path.join(save_dir, "pies.png"))
     image.save(img_alpha, os.path.join(save_dir, "pies_alpha.png"))
 
+def test_line(save_dir):
+    img, img_alpha = init(save_dir)
+    img = line(img, (100, 200), (100, 100), (255, 255, 0, 255), 50, True)
+    img = line(img, (200, 100), (100, 50), (255, 0, 0, 255), 0, False)
+    img = line(img, (300, 300), (70, 10), (0, 255, 0, 255), 20, False)
+    img = line(img, (400, 150), (100, 0), (255, 0, 255, 255), 10, True)
+
+    img_alpha = line(img_alpha, (100, 200), (100, 100), (255, 255, 0, 125), 50, True)
+    img_alpha = line(img_alpha, (200, 100), (100, 50), (255, 0, 0, 255), 0, False)
+    img_alpha = line(img_alpha, (300, 300), (70, 10), (0, 255, 0, 255), 20, False)
+    img_alpha = line(img_alpha, (400, 150), (100, 0), (255, 0, 255, 70), 10, True)
+
+    image.save(img, os.path.join(save_dir, "lines.png"))
+    image.save(img_alpha, os.path.join(save_dir, "lines_alpha.png"))
+
 save_dir = "test_results"
 # test_circle(save_dir)
 # test_ellipse(save_dir)
-test_arc(save_dir)
-test_pie(save_dir)
+# test_arc(save_dir)
+# test_pie(save_dir)
+test_line(save_dir)

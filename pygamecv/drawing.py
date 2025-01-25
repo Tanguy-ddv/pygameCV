@@ -1,10 +1,10 @@
 """The art._drawing submodule contains functions to draw something on an Art."""
 
 import numpy as np
-from pygame import Surface, Color
+from pygame import Surface, Color, Rect
 import cv2 as cv
 from .decorator import cv_transformation
-from .common import get_ellipse_rect, start_stop_arc
+from .common import get_ellipse_rect
 
 @cv_transformation
 def _cv_circle(surf_array: np.ndarray, center: tuple[int, int], radius: int, color: Color, thickness: int, antialias):
@@ -142,3 +142,15 @@ def pie(
         return _cv_lines(surface, points=points, color=color, thickness=thickness, antialias=antialias, closed=True)
     else:
         return arc(surface, center, radius_x, radius_y, color, thickness, antialias, angle, start_angle, end_angle)
+
+def line(surface: Surface, p1: tuple[int, int], p2: tuple[int, int], color: Color, thickness: int, antialias: bool):
+    if thickness <= 0:
+        return surface
+    left = min(p1[0], p2[0]) - thickness//2
+    right = max(p1[0], p2[0]) + thickness//2 +1
+    top = min(p1[1], p2[1]) - thickness//2
+    bottom = max(p1[1], p2[1]) + thickness//2 + 1
+    rect = Rect(left, top, right - left, bottom - top)
+    p1 = p1[0] - left, p1[1] - top
+    p2 = p2[0] - left, p2[1] - top
+    return _cv_line(surface, rect, p1 = p1, p2 = p2, color=color, thickness=thickness, antialias=antialias)
