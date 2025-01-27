@@ -1,7 +1,7 @@
 """The art._drawing submodule contains functions to draw something on an Art."""
 
 import numpy as np
-from pygame import Surface, Color, Rect
+from pygame import Surface, Color, Rect, draw
 import cv2 as cv
 from .decorator import cv_transformation
 from .common import get_ellipse_rect
@@ -72,6 +72,19 @@ def _cv_lines(
         alpha = color[3]
         cv.addWeighted(padded_array, alpha/255, overlay, 1 - alpha/255, 0, padded_array)
     surf_array[:, :, :] = padded_array[pad_left: padded_array.shape[0]-pad_right, pad_top: padded_array.shape[1] - pad_bottom]
+
+@cv_transformation
+def _cv_rectangle(
+    surf_array: np.ndarray,
+    color: Color,
+    thickness: int
+):
+    color = tuple(color)
+    rectangle = np.full(surf_array.shape, np.array(tuple(color)), dtype=np.uint8)
+    if thickness != 0:
+        innner_shape = surf_array.shape[0] - 2*thickness, surf_array.shape[1] - 2*thickness, surf_array.shape[2]
+        rectangle[thickness:-thickness, thickness:-thickness] = np.full(innner_shape, np.zeros((len(color),)))
+    cv.addWeighted(surf_array, 1 - color[3]/255, rectangle, color[3]/255, 0, surf_array)
 
 def circle(surface: Surface, center: tuple[int, int], radius: int, color: Color, thickness: int, antialias: bool):
     if radius <= 1:
@@ -163,3 +176,22 @@ def lines(surface: Surface, points: list[tuple[int, int]], color: Color, thickne
     rect = Rect(left, top, right - left, bottom - top)
     points = [[point[0] - left, point[1] - top] for point in points]
     return _cv_lines(surface, rect, points=points, color=color, thickness=thickness, antialias=antialias, closed=closed)
+
+def polygon(surface):
+    pass
+
+def rectangle(surface: Surface, rect: Rect, color: Color, thickness: int):
+    color = Color(color)
+    if (surface.get_alpha() is None or color.a == 255) and thickness == 0:
+        surface.fill(color, rect)
+        return surface
+    elif (surface.get_alpha() is None or color.a == 255):
+        draw.rect(surface, color, rect, thickness)
+        return surface
+    return _cv_rectangle(surface, rect, color=color, thickness=thickness)
+
+def rounded_rectangle(surface):
+    pass
+
+# Add default cases using pygame transformations (ellipses, circles, rectangle, line(s) ... without alpha and aa.)
+# Add color effects based on masks.

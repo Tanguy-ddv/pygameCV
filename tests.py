@@ -1,6 +1,6 @@
 
-from pygamecv.drawing import circle, ellipse, arc, pie, line, lines
-from pygame import image, display, draw
+from pygamecv.drawing import circle, ellipse, arc, pie, line, lines, rectangle
+from pygame import image, display, Rect
 import os
 
 def init(save_dir):
@@ -110,10 +110,28 @@ def test_lines(save_dir):
     image.save(img, os.path.join(save_dir, "liness.png"))
     image.save(img_alpha, os.path.join(save_dir, "liness_alpha.png"))
 
+def test_rectangle(save_dir):
+    img, img_alpha = init(save_dir)
+    img = rectangle(img, Rect((100, 200),  (200, 300)), (255, 255, 0, 255), 50)
+    img = rectangle(img, Rect((200, 100), (50, 50)), (255, 0, 0, 255), 5)
+    img = rectangle(img, Rect((300, 300), (10, 10)), (0, 255, 0, 255), 0)
+    img = rectangle(img, Rect((400, 150), (400, 400)), (255, 0, 255, 255), 0)
+
+    img_alpha = rectangle(img_alpha, Rect((100, 200),  (200, 300)), (255, 255, 0, 50), 50)
+    img_alpha = rectangle(img_alpha, Rect((200, 100), (50, 50)), (255, 0, 0, 255), 5)
+    img_alpha = rectangle(img_alpha, Rect((300, 300), (10, 10)), (0, 255, 0, 255), 0)
+    img_alpha = rectangle(img_alpha, Rect((400, 150), (400, 400)), (255, 0, 255, 200), 0)
+
+    image.save(img, os.path.join(save_dir, "rectangles.png"))
+    image.save(img_alpha, os.path.join(save_dir, "rectangles_alpha.png"))
+
+
+
 save_dir = "test_results"
 # test_circle(save_dir)
 # test_ellipse(save_dir)
 # test_arc(save_dir)
 # test_pie(save_dir)
 # test_line(save_dir)
-test_lines(save_dir)
+# test_lines(save_dir)
+test_rectangle(save_dir)
