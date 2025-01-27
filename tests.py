@@ -1,6 +1,6 @@
 
-from pygamecv.drawing import circle, ellipse, arc, pie, line, lines, rectangle
-from pygame import image, display, Rect
+from pygamecv.drawing import circle, ellipse, arc, pie, line, lines, rectangle, rounded_rectangle
+from pygame import image, display, Rect, draw
 import os
 
 def init(save_dir):
@@ -125,6 +125,23 @@ def test_rectangle(save_dir):
     image.save(img, os.path.join(save_dir, "rectangles.png"))
     image.save(img_alpha, os.path.join(save_dir, "rectangles_alpha.png"))
 
+def test_rounded_rectangle(save_dir):
+    img, img_alpha = init(save_dir)
+    img = rounded_rectangle(img, Rect((100, 200),  (200, 300)), (255, 255, 0, 255), 0, True, 50)
+    img = rounded_rectangle(img, Rect((200, 100), (50, 50)), (255, 0, 0, 255), 5, True, 0)
+    img = rounded_rectangle(img, Rect((300, 300), (10, 10)), (0, 255, 0, 255), 0, False, 10, 10, 20, 20)
+    img = rounded_rectangle(img, Rect((200, 150), (200, 200)), (255, 0, 255, 255), 0, True, 100, 0, 0, 100)
+
+    img_alpha = rounded_rectangle(img_alpha, Rect((100, 200),  (200, 300)), (255, 255, 0, 50), 0, True, 100)
+    img_alpha = rounded_rectangle(img_alpha, Rect((200, 100), (50, 50)), (255, 0, 0, 255), 5, True, 0)
+    img_alpha = rounded_rectangle(img_alpha, Rect((300, 300), (10, 10)), (0, 255, 0, 255), 0, False, 10, 10, 20, 20)
+    img_alpha = rounded_rectangle(img_alpha, Rect((200, 150), (200, 200)), (255, 0, 255, 200), 0, True, 100, 0, 0, 100)
+
+    draw.rect(img_alpha, (0, 0, 0, 255), Rect((100, 200),  (200, 300)), 10)
+
+    image.save(img, os.path.join(save_dir, "rounded_rectangles.png"))
+    image.save(img_alpha, os.path.join(save_dir, "rounded_rectangles_alpha.png"))
+
 
 
 save_dir = "test_results"
@@ -134,4 +151,4 @@ save_dir = "test_results"
 # test_pie(save_dir)
 # test_line(save_dir)
 # test_lines(save_dir)
-test_rectangle(save_dir)
+test_rounded_rectangle(save_dir)

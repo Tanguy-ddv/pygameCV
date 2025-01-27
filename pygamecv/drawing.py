@@ -86,6 +86,36 @@ def _cv_rectangle(
         rectangle[thickness:-thickness, thickness:-thickness] = np.full(innner_shape, np.zeros((len(color),)))
     cv.addWeighted(surf_array, 1 - color[3]/255, rectangle, color[3]/255, 0, surf_array)
 
+@cv_transformation
+def _cv_rounded_rectangle(
+    surf_array: np.ndarray,
+    color: Color,
+    thickness: int,
+    antialias: bool,
+    top_left: int,
+    top_right: int,
+    bottom_left: int,
+    bottom_right: int,
+):
+    delta = 6//(antialias+1)
+    line_type = cv.LINE_AA if antialias else cv.LINE_8
+    w, h, _ = surf_array.shape
+    top_left_points = list(cv.ellipse2Poly((top_left, top_left), (top_left, top_left), 0, 180, 270, delta))
+    top_right_points = list(cv.ellipse2Poly((h - top_right, top_right), (top_right, top_right), 0, 0, -90, delta))
+    bottom_right_points = list(cv.ellipse2Poly((h - bottom_right, w - bottom_right), (bottom_right, bottom_right), 0, 0, 90, delta))
+    bottom_left_points = list(cv.ellipse2Poly((bottom_left, w - bottom_left), (bottom_left, bottom_left), 0, 90, 180, delta))
+    points = np.array(top_left_points + top_right_points + bottom_right_points + bottom_left_points)
+    overlay = surf_array.copy()
+    points = points.reshape((-1, 1, 2))  # Shape it into (n, 1, 2)
+    if thickness:
+        cv.polylines(surf_array, [points], True, color, thickness, line_type, 0)
+    else:
+        cv.fillPoly(surf_array, [points], color, line_type, 0, [0, 0])
+
+    if len(color) == 4:
+        alpha = color[3]
+        cv.addWeighted(surf_array, alpha/255, overlay, 1 - alpha/255, 0, surf_array)
+
 def circle(surface: Surface, center: tuple[int, int], radius: int, color: Color, thickness: int, antialias: bool):
     if radius <= 1:
         return surface
@@ -190,8 +220,21 @@ def rectangle(surface: Surface, rect: Rect, color: Color, thickness: int):
         return surface
     return _cv_rectangle(surface, rect, color=color, thickness=thickness)
 
-def rounded_rectangle(surface):
-    pass
+def rounded_rectangle(surface: Surface, rect: Rect, color: Color, thickness: int, antialias: bool, top_left: int, top_right: int = None, bottom_left: int = None, bottom_right: int = None,):
+    color = Color(color)
+    if top_right is None:
+        top_right = top_left
+    if bottom_right is None:
+        bottom_right = top_left
+    if bottom_left is None:
+        bottom_left = top_left
+    print(top_left, top_right, bottom_left, bottom_right)
+    if (surface.get_alpha() is None or color.a == 255) and (not antialias or top_right == top_left == bottom_right == bottom_left == 0):
+        draw.rect(surface, color, rect, thickness, top_left, top_left, top_right, bottom_left, bottom_right)
+        return surface
+    else:
+        return _cv_rounded_rectangle(surface, rect, color=color, thickness=thickness, antialias=antialias,
+                                    top_left=top_left, top_right=top_right, bottom_left=bottom_left, bottom_right=bottom_right)
 
 # Add default cases using pygame transformations (ellipses, circles, rectangle, line(s) ... without alpha and aa.)
 # Add color effects based on masks.
