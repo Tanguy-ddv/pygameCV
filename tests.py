@@ -1,5 +1,5 @@
 
-from pygamecv.drawing import circle, ellipse, arc, pie, line, lines, rectangle, rounded_rectangle
+from pygamecv.drawing import circle, ellipse, arc, pie, line, lines, rectangle, rounded_rectangle, polygon
 from pygame import image, display, Rect, draw
 import os
 
@@ -142,6 +142,20 @@ def test_rounded_rectangle(save_dir):
     image.save(img, os.path.join(save_dir, "rounded_rectangles.png"))
     image.save(img_alpha, os.path.join(save_dir, "rounded_rectangles_alpha.png"))
 
+def test_polygon(save_dir):
+    img, img_alpha = init(save_dir)
+    img = polygon(img, [(100, 200), (100, 100), (200, 300)], (255, 255, 0, 255), 50, True)
+    img = polygon(img, [(200, 100), (100, 50), (50, 50)], (255, 0, 0, 255), 5, False)
+    img = polygon(img, [(300, 300), (70, 10), (10, 10)], (0, 255, 0, 255), 0, False)
+    img = polygon(img, [(400, 150), (100, 0), (400, 400)], (255, 0, 255, 255), 10, True)
+
+    img_alpha = polygon(img_alpha, [(100, 200), (100, 100), (200, 300)], (255, 255, 0, 125), 50, True)
+    img_alpha = polygon(img_alpha, [(200, 100), (100, 50), (50, 50)], (255, 0, 0, 255), 5, False)
+    img_alpha = polygon(img_alpha, [(300, 300), (70, 10), (10, 10)], (0, 255, 0, 125), 20, False)
+    img_alpha = polygon(img_alpha, [(400, 150), (100, 0), (400, 400)], (255, 0, 255, 255), 10, True)
+
+    image.save(img, os.path.join(save_dir, "polygones.png"))
+    image.save(img_alpha, os.path.join(save_dir, "polygones_alpha.png"))
 
 
 save_dir = "test_results"
@@ -151,4 +165,5 @@ save_dir = "test_results"
 # test_pie(save_dir)
 # test_line(save_dir)
 # test_lines(save_dir)
-test_rounded_rectangle(save_dir)
+# test_rounded_rectangle(save_dir)
+test_polygon(save_dir)

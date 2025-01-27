@@ -74,6 +74,34 @@ def _cv_lines(
     surf_array[:, :, :] = padded_array[pad_left: padded_array.shape[0]-pad_right, pad_top: padded_array.shape[1] - pad_bottom]
 
 @cv_transformation
+def _cv_polygon(
+    surf_array: np.ndarray,
+    points: list[tuple[int, int]],
+    color: Color,
+    antialias: bool,
+):
+    color = tuple(color)
+    line_type = cv.LINE_AA if antialias else cv.LINE_8
+    pad_left = -min(0, min(point[0] for point in points))
+    pad_right = max(0, max(point[0] - surf_array.shape[0] for point in points))
+    pad_top = -min(0, min(point[1] for point in points))
+    pad_bottom = max(0, max(point[1] - surf_array.shape[1] for point in points))
+    padded_array = np.pad(surf_array, (
+        (pad_left, pad_right), (pad_top, pad_bottom), (0, 0)
+    ),
+        mode='constant',
+        constant_values=((0, 0), (0, 0), (0, 0)))
+    overlay = padded_array.copy()
+    points = np.array([[point[0] - pad_left, point[1] - pad_top] for point in points], np.int32)
+    points = points.reshape((-1, 1, 2))  # Shape it into (n, 1, 2)
+    cv.fillPoly(padded_array, [points], color, line_type, 0, [0, 0])
+
+    if len(color) == 4:
+        alpha = color[3]
+        cv.addWeighted(padded_array, alpha/255, overlay, 1 - alpha/255, 0, padded_array)
+    surf_array[:, :, :] = padded_array[pad_left: padded_array.shape[0]-pad_right, pad_top: padded_array.shape[1] - pad_bottom]
+
+@cv_transformation
 def _cv_rectangle(
     surf_array: np.ndarray,
     color: Color,
@@ -228,13 +256,25 @@ def rounded_rectangle(surface: Surface, rect: Rect, color: Color, thickness: int
         bottom_right = top_left
     if bottom_left is None:
         bottom_left = top_left
-    print(top_left, top_right, bottom_left, bottom_right)
     if (surface.get_alpha() is None or color.a == 255) and (not antialias or top_right == top_left == bottom_right == bottom_left == 0):
         draw.rect(surface, color, rect, thickness, top_left, top_left, top_right, bottom_left, bottom_right)
         return surface
     else:
         return _cv_rounded_rectangle(surface, rect, color=color, thickness=thickness, antialias=antialias,
                                     top_left=top_left, top_right=top_right, bottom_left=bottom_left, bottom_right=bottom_right)
+
+def polygon(surface: Surface, points: list[tuple[int, int]], color: Color, thickness: int, antialias: bool):
+    color = Color(color)    
+    left = min(point[0] for point in points) - thickness//2
+    right = max(point[0] for point in points) + thickness//2 +1
+    top = min(point[1] for point in points) - thickness//2
+    bottom = max(point[1] for point in points) + thickness//2 + 1
+    rect = Rect(left, top, right - left, bottom - top)
+    points = [[point[0] - left, point[1] - top] for point in points]
+    if thickness:
+        return _cv_lines(surface, rect, points=points, color=color, thickness=thickness, antialias=antialias, closed=True)
+    else:
+        return _cv_polygon(surface, rect, points=points, color=color, antialias=antialias)
 
 # Add default cases using pygame transformations (ellipses, circles, rectangle, line(s) ... without alpha and aa.)
 # Add color effects based on masks.
