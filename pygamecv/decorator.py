@@ -32,13 +32,13 @@ def cv_transformation(func: Callable[[np.ndarray], None]):
                 subsurf.blit(surface, target_position, overlap_rect)
 
         if alpha is None: # the image does not have any alpha channel.
-            array_surf = np.ascontiguousarray((sa.pixels3d(subsurf)).swapaxes(1, 0))
+            array_surf = (sa.pixels3d(subsurf)).swapaxes(1, 0)
             func(array_surf, **kwargs)
             new_surf = sa.make_surface(array_surf.swapaxes(1, 0))
         else:
             # Convert the surface in open cv's format, taking the alpha channel into account.
             subsurf = subsurf.convert_alpha()
-            array_surf = np.ascontiguousarray(np.dstack((sa.pixels3d(subsurf), sa.pixels_alpha(subsurf))).swapaxes(1, 0))
+            array_surf = np.dstack((sa.pixels3d(subsurf), sa.pixels_alpha(subsurf))).swapaxes(1, 0)
             # Call the function
             func(array_surf, **kwargs)
             # Convert it back using the alpha channel.
