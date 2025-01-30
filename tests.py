@@ -1,6 +1,8 @@
 
 from pygamecv.drawing import circle, ellipse, arc, pie, line, lines, rectangle, rounded_rectangle, polygon
+from pygamecv.effects import saturate, desaturate, set_saturation, lighten, darken, set_luminosity
 from pygame import image, display, Rect, draw
+import numpy as np
 import os
 
 def init(save_dir):
@@ -157,6 +159,112 @@ def test_polygon(save_dir):
     image.save(img, os.path.join(save_dir, "polygones.png"))
     image.save(img_alpha, os.path.join(save_dir, "polygones_alpha.png"))
 
+def circle_mask(width, height) -> np.ndarray:
+    x_grid, y_grid = np.ogrid[:width, :height]
+    radius = min(width/2, height/2)
+    mask = (x_grid - width/2 + 0.5)**2 + (y_grid - height/2 + 0.5)**2 < radius**2
+    return mask.astype(float)
+
+def test_circle(width, height):
+    mask = circle_mask(width, height)
+    print(mask)
+
+def test_saturatation(save_dir):
+    img, _ = init(save_dir)
+    img = saturate(img, 0.5)
+    image.save(img, os.path.join(save_dir, "saturation50.png"))
+
+    img, _ = init(save_dir)
+    img = saturate(img, 0.1)
+    image.save(img, os.path.join(save_dir, "saturation10.png"))
+
+    img, _ = init(save_dir)
+    img = saturate(img, 1)
+    image.save(img, os.path.join(save_dir, "saturation100.png"))
+
+    img, _ = init(save_dir)
+    mask = circle_mask(*img.get_size())
+    img =saturate(img, mask)
+    image.save(img, os.path.join(save_dir, "saturationcircle.png"))
+
+    img, _ = init(save_dir)
+    img = desaturate(img, 0.5)
+    image.save(img, os.path.join(save_dir, "desaturation50.png"))
+
+    img, _ = init(save_dir)
+    img = desaturate(img, 0.1)
+    image.save(img, os.path.join(save_dir, "desaturation10.png"))
+
+    img, _ = init(save_dir)
+    img = desaturate(img, 1)
+    image.save(img, os.path.join(save_dir, "desaturation100.png"))
+
+    img, _ = init(save_dir)
+    mask = circle_mask(*img.get_size())
+    img = desaturate(img, mask)
+    image.save(img, os.path.join(save_dir, "desaturationcircle.png"))
+
+    img, _ = init(save_dir)
+    img = set_saturation(img, 0.5)
+    image.save(img, os.path.join(save_dir, "set_saturation50.png"))
+
+    img, _ = init(save_dir)
+    img = set_saturation(img, 1)
+    image.save(img, os.path.join(save_dir, "set_saturation100.png"))
+
+    img, _ = init(save_dir)
+    mask = circle_mask(*img.get_size())
+    img = set_saturation(img, mask)
+    image.save(img, os.path.join(save_dir, "set_sturationcircle.png"))
+
+def test_luminosity(save_dir):
+    img, _ = init(save_dir)
+    img = lighten(img, 0.5)
+    image.save(img, os.path.join(save_dir, "lighten50.png"))
+
+    img, _ = init(save_dir)
+    img = lighten(img, 0.1)
+    image.save(img, os.path.join(save_dir, "lighten10.png"))
+
+    img, _ = init(save_dir)
+    img = lighten(img, 1)
+    image.save(img, os.path.join(save_dir, "lighten100.png"))
+
+    img, _ = init(save_dir)
+    mask = circle_mask(*img.get_size())
+    img = lighten(img, mask)
+    image.save(img, os.path.join(save_dir, "lightencircle.png"))
+
+    img, _ = init(save_dir)
+    img = darken(img, 0.5)
+    image.save(img, os.path.join(save_dir, "darken50.png"))
+
+    img, _ = init(save_dir)
+    img = darken(img, 0.1)
+    image.save(img, os.path.join(save_dir, "darken10.png"))
+
+    img, _ = init(save_dir)
+    img = darken(img, 1)
+    image.save(img, os.path.join(save_dir, "darken100.png"))
+
+    img, _ = init(save_dir)
+    mask = circle_mask(*img.get_size())
+    img = darken(img, mask)
+    image.save(img, os.path.join(save_dir, "darkencircle.png"))
+
+    img, _ = init(save_dir)
+    img = set_luminosity(img, 0.5)
+    image.save(img, os.path.join(save_dir, "set_luminosity50.png"))
+
+    img, _ = init(save_dir)
+    img = set_luminosity(img, 1)
+    image.save(img, os.path.join(save_dir, "set_luminosity100.png"))
+
+    img, _ = init(save_dir)
+    mask = circle_mask(*img.get_size())
+    img = set_luminosity(img, mask)
+    image.save(img, os.path.join(save_dir, "set_luminositycircle.png"))
+
 
 save_dir = "test_results"
 # test_circle(save_dir)
@@ -166,4 +274,7 @@ save_dir = "test_results"
 # test_line(save_dir)
 # test_lines(save_dir)
 # test_rounded_rectangle(save_dir)
-test_polygon(save_dir)
+# test_polygon(save_dir)
+# test_circle(15, 7)
+# test_saturatation(save_dir)
+test_luminosity(save_dir)
