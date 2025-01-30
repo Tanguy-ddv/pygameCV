@@ -1,6 +1,6 @@
 
 from pygamecv.drawing import circle, ellipse, arc, pie, line, lines, rectangle, rounded_rectangle, polygon
-from pygamecv.effects import saturate, desaturate, set_saturation, lighten, darken, set_luminosity
+from pygamecv.effects import saturate, desaturate, set_saturation, lighten, darken, set_luminosity, shift_hue, set_hue
 from pygame import image, display, Rect, draw
 import numpy as np
 import os
@@ -265,6 +265,38 @@ def test_luminosity(save_dir):
     img = set_luminosity(img, mask)
     image.save(img, os.path.join(save_dir, "set_luminositycircle.png"))
 
+def test_hue(save_dir):
+    
+    img, _ = init(save_dir)
+    img = shift_hue(img, 0.5)
+    image.save(img, os.path.join(save_dir, "huet50.png"))
+
+    img, _ = init(save_dir)
+    img = shift_hue(img, 0.1)
+    image.save(img, os.path.join(save_dir, "hue10.png"))
+
+    img, _ = init(save_dir)
+    img = shift_hue(img, 1)
+    image.save(img, os.path.join(save_dir, "hue100.png"))
+
+    img, _ = init(save_dir)
+    mask = circle_mask(*img.get_size())
+    img = shift_hue(img, mask/2)
+    image.save(img, os.path.join(save_dir, "huecircle.png"))
+
+    img, _ = init(save_dir)
+    img = set_hue(img, 0.2)
+    image.save(img, os.path.join(save_dir, "set_hue50.png"))
+
+    img, _ = init(save_dir)
+    img = set_hue(img, 0.6)
+    image.save(img, os.path.join(save_dir, "set_hue100.png"))
+
+    img, _ = init(save_dir)
+    mask = circle_mask(*img.get_size())
+    img = set_hue(img, mask/2)
+    image.save(img, os.path.join(save_dir, "set_huecircle.png"))
+
 
 save_dir = "test_results"
 # test_circle(save_dir)
@@ -277,4 +309,5 @@ save_dir = "test_results"
 # test_polygon(save_dir)
 # test_circle(15, 7)
 # test_saturatation(save_dir)
-test_luminosity(save_dir)
+# test_luminosity(save_dir)
+test_hue(save_dir)
