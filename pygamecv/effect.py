@@ -116,53 +116,43 @@ def _cv_set_hue(rgb_array: np.ndarray, value: np.ndarray):
 
 def saturate(surface: Surface, factor: float | np.ndarray[float]):
     factor, rect = _make_factor_and_rect_from_mask(surface, factor)
-    if factor is None:
-        return surface
-    else:
-        return _cv_saturate(surface, rect, factor=factor)
+    if not factor is None:
+        _cv_saturate(surface, rect, factor=factor)
 
 def desaturate(surface: Surface, factor: float | np.ndarray[float]):
     factor, rect = _make_factor_and_rect_from_mask(surface, factor)
-    if factor is None:
-        return surface
-    else:
-        return _cv_desaturate(surface, rect, factor=factor)
+    if not factor is None:
+        _cv_desaturate(surface, rect, factor=factor)
 
 def set_saturation(surface: Surface, value: float | np.ndarray):
     if isinstance(value, (float | int)):
         value = np.full(surface.get_size(), value)
     value = value.swapaxes(0, 1)*255
-    return _cv_set_saturation(surface, None, value=value)
+    _cv_set_saturation(surface, None, value=value)
 
 def lighten(surface: Surface, factor: float | np.ndarray[float]):
     factor, rect = _make_factor_and_rect_from_mask(surface, factor)
-    if factor is None:
-        return surface
-    else:
-        return _cv_lighten(surface, rect, factor=factor)
+    if not factor is None:
+        _cv_lighten(surface, rect, factor=factor)
 
 def darken(surface: Surface, factor: float | np.ndarray[float]):
     factor, rect = _make_factor_and_rect_from_mask(surface, factor)
-    if factor is None:
-        return surface
-    else:
-        return _cv_darken(surface, rect, factor=factor)
+    if not factor is None:
+         _cv_darken(surface, rect, factor=factor)
 
 def set_luminosity(surface: Surface, value: float | np.ndarray):
     if isinstance(value, (float | int)):
         value = np.full(surface.get_size(), value)
     value = value.swapaxes(0, 1)*255
-    return _cv_set_luminosity(surface, None, value=value)
+    _cv_set_luminosity(surface, None, value=value)
 
 def shift_hue(surface: Surface, factor: float | np.ndarray[float]):
     factor, rect = _make_factor_and_rect_from_mask(surface, factor)
-    if factor is None:
-        return surface
-    else:
-        return _cv_shift_hue(surface, rect, factor=factor)
+    if not factor is None:
+        _cv_shift_hue(surface, rect, factor=factor)
 
 def set_hue(surface: Surface, value: float | np.ndarray):
     if isinstance(value, (float | int)):
         value = np.full(surface.get_size(), value)
     value = value.swapaxes(0, 1)*180
-    return _cv_set_hue(surface, None, value=value)
+    _cv_set_hue(surface, None, value=value)
