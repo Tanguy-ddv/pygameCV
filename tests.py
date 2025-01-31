@@ -165,6 +165,11 @@ def circle_mask(width, height) -> np.ndarray:
     mask = (x_grid - width/2 + 0.5)**2 + (y_grid - height/2 + 0.5)**2 < radius**2
     return mask.astype(float)
 
+def diag_mask(width, height) -> np.ndarray:
+    x_grid, y_grid = np.ogrid[:width, :height]
+    mask = (x_grid/width + y_grid/height) < 1
+    return mask
+
 def test_circle_mask(width, height):
     mask = circle_mask(width, height)
     print(mask)
@@ -205,16 +210,16 @@ def test_saturatation(save_dir):
     image.save(img, os.path.join(save_dir, "desaturationcircle.png"))
 
     img, _ = init(save_dir)
-    set_saturation(img, 0.5)
+    set_saturation(img, 125)
     image.save(img, os.path.join(save_dir, "set_saturation50.png"))
 
     img, _ = init(save_dir)
-    set_saturation(img, 1)
+    set_saturation(img, 255)
     image.save(img, os.path.join(save_dir, "set_saturation100.png"))
 
     img, _ = init(save_dir)
     mask = circle_mask(*img.get_size())
-    set_saturation(img, mask)
+    set_saturation(img, mask*255)
     image.save(img, os.path.join(save_dir, "set_sturationcircle.png"))
 
 def test_luminosity(save_dir):
@@ -253,48 +258,49 @@ def test_luminosity(save_dir):
     image.save(img, os.path.join(save_dir, "darkencircle.png"))
 
     img, _ = init(save_dir)
-    set_luminosity(img, 0.5)
+    set_luminosity(img, 125)
     image.save(img, os.path.join(save_dir, "set_luminosity50.png"))
 
     img, _ = init(save_dir)
-    set_luminosity(img, 1)
+    set_luminosity(img, 255)
     image.save(img, os.path.join(save_dir, "set_luminosity100.png"))
 
     img, _ = init(save_dir)
     mask = circle_mask(*img.get_size())
-    set_luminosity(img, mask)
+    set_luminosity(img, mask*255)
     image.save(img, os.path.join(save_dir, "set_luminositycircle.png"))
 
 def test_hue(save_dir):
     
     img, _ = init(save_dir)
-    shift_hue(img, 0.5)
+    shift_hue(img, 90)
     image.save(img, os.path.join(save_dir, "huet50.png"))
 
     img, _ = init(save_dir)
-    shift_hue(img, 0.1)
+    shift_hue(img, 18)
     image.save(img, os.path.join(save_dir, "hue10.png"))
 
     img, _ = init(save_dir)
-    shift_hue(img, 1)
+    shift_hue(img, 360)
     image.save(img, os.path.join(save_dir, "hue100.png"))
 
     img, _ = init(save_dir)
     mask = circle_mask(*img.get_size())
-    shift_hue(img, mask/2)
+    shift_hue(img, mask*30 + 10)
     image.save(img, os.path.join(save_dir, "huecircle.png"))
 
     img, _ = init(save_dir)
-    set_hue(img, 0.2)
+    set_hue(img, 36)
     image.save(img, os.path.join(save_dir, "set_hue50.png"))
 
     img, _ = init(save_dir)
-    set_hue(img, 0.6)
+    mask = diag_mask(*img.get_size())
+    set_hue(img, 100, mask)
     image.save(img, os.path.join(save_dir, "set_hue100.png"))
 
     img, _ = init(save_dir)
     mask = circle_mask(*img.get_size())
-    set_hue(img, mask/2)
+    set_hue(img, mask*90)
     image.save(img, os.path.join(save_dir, "set_huecircle.png"))
 
 def test_angles(save_dir):
@@ -319,4 +325,4 @@ save_dir = "test_results"
 # test_saturatation(save_dir)
 # test_luminosity(save_dir)
 # test_hue(save_dir)
-test_angles(save_dir)
+test_hue(save_dir)
