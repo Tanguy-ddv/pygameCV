@@ -8,8 +8,8 @@ import os
 def init(save_dir):
     display.init()
     display.set_mode((100, 100))
-    img = image.load("Lenna.png")
-    img_alpha = image.load("Lenna_alpha.png")
+    img = image.load("images/Lenna.png")
+    img_alpha = image.load("images/Lenna_alpha.png")
     os.makedirs(save_dir, exist_ok=True)
     return img, img_alpha
 
@@ -312,6 +312,119 @@ def test_angles(save_dir):
 
     image.save(img, os.path.join(save_dir, "angles.png"))
 
+def demo(save_dir):
+    img, _ = init(save_dir)
+    ellipse(
+        surface=img,
+        center=(100, 200),
+        radius_x=50,
+        radius_y=40,
+        color=(0, 255, 255),
+        thickness=10, # This is pygame.draw's 'width' argument
+        antialias=True,
+        angle=0,
+    )
+
+    image.save(img, os.path.join(save_dir, "ellipse.png"))
+
+    img, _ = init(save_dir)
+    rectangle(
+        surface=img,
+        rect=(200, 200, 150, 300),
+        color=(0, 255, 255, 100),
+        thickness=0
+    )
+    
+    image.save(img, os.path.join(save_dir, "rectangle.png"))
+    img, _ = init(save_dir)
+
+    rounded_rectangle(
+        surface=img,
+        rect=(200, 200, 150, 300),
+        color=(0, 255, 255, 255),
+        thickness=20,
+        antialias=True,
+        top_left=15,
+        bottom_right=135,
+    )
+
+    image.save(img, os.path.join(save_dir, "rounded_rectangle.png"))
+    img, _ = init(save_dir)
+
+    saturate(
+        surface=img,
+        factor=1
+    )
+
+    image.save(img, os.path.join(save_dir, "saturation.png"))
+    img, _ = init(save_dir)
+
+
+    shift_hue(
+        surface=img,
+        value=60
+    )
+
+    darken(
+        surface=img,
+        factor=0.5
+    )
+
+    image.save(img, os.path.join(save_dir, "darken_shift_hue.png"))
+
+    img, _ = init(save_dir)
+
+    def gradient_factor(width, height, min_radius) -> np.ndarray:
+        x_grid, y_grid = np.ogrid[:width, :height]
+        dist_to_center = np.sqrt((x_grid - width/2 + 0.5)**2 + (y_grid - height/2 + 0.5)**2)
+        unchanged = dist_to_center < min_radius
+        max_radius = np.sqrt((width/2 - 0.5)**2 + (height/2-0.5)**2)
+        factor = (dist_to_center - min_radius)/(max_radius - min_radius)
+        factor[unchanged] = 0
+        return factor
+
+    factor=gradient_factor(*img.get_size(), min_radius=50)
+
+    darken(
+        surface=img,
+        factor=factor
+    )
+
+    image.save(img, os.path.join(save_dir, "circle_darkened.png"))
+
+    img, _ = init(save_dir)
+
+    def circle_mask(width, height, radius) -> np.ndarray:
+        x_grid, y_grid = np.ogrid[:width, :height]
+        dist_to_center = np.sqrt((x_grid - width/2 + 0.5)**2 + (y_grid - height/2 + 0.5)**2)
+        return dist_to_center < radius
+ 
+    mask = circle_mask(*img.get_size(), 100)
+
+    set_saturation(
+        surface=img,
+        value=0,
+        mask=mask
+    )
+
+    image.save(img, os.path.join(save_dir, "circle_saturation.png"))
+
+
+    from pygamecv.common import cv_transformation
+    from pygame import Surface
+    
+
+    @cv_transformation
+    def _cv_your_function(img, **kwargs):
+        ...
+    
+    def your_function(surface: Surface, rect: Rect = None, **kwargs):
+        _cv_your_function(surface, rect, **kwargs)
+    
+    img = image.load("images/Lenna_noise.png")
+    your_function(img, None, (11, 11), 20)
+    image.save(img, os.path.join(save_dir, "guassian_blur.png"))
+
 save_dir = "test_results"
 # test_circle(save_dir)
 # test_ellipse(save_dir)
@@ -325,4 +438,7 @@ save_dir = "test_results"
 # test_saturatation(save_dir)
 # test_luminosity(save_dir)
 # test_hue(save_dir)
-test_hue(save_dir)
+save_dir = "images"
+
+demo(save_dir)
+
