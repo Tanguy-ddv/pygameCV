@@ -252,7 +252,7 @@ Modify a Surface using cv may be long, as copying the value of the pixels needs 
 
 ## Contributing
 
-Everyone is welcome to contribute to this project by proposing new features and optimizations!
+Everyone is welcome to contribute to this project by proposing new features and optimizations! Your feedbacks will be appreciated.
 
 ## License
 
