@@ -291,10 +291,14 @@ def circle(surface: Surface, center: tuple[int, int], radius: int, color: Color,
     """
     if radius <= 1:
         return
-    color = tuple(color)
-    rect = _get_ellipse_rect(center, radius, radius, thickness, 0)
-    center = radius + thickness//2, radius + thickness//2
-    _cv_circle(surface, rect=rect, center=center, radius=radius, color=color, thickness=thickness if thickness else -1, antialias=antialias)
+    color = Color(color)
+    if (surface.get_alpha() is None or color.a == 255) and not antialias:
+        draw.circle(surface, color, center, radius, thickness)
+    else:
+        color = tuple(color)
+        rect = _get_ellipse_rect(center, radius, radius, thickness, 0)
+        center = radius + thickness//2, radius + thickness//2
+        _cv_circle(surface, rect=rect, center=center, radius=radius, color=color, thickness=thickness if thickness else -1, antialias=antialias)
 
 def ellipse(surface: Surface, center: tuple[int, int], radius_x: int, radius_y: int, color: Color, thickness: int, antialias: bool, angle: int = 0):
     """
@@ -313,19 +317,25 @@ def ellipse(surface: Surface, center: tuple[int, int], radius_x: int, radius_y: 
     """
     if radius_x <= 0 or radius_y <= 0:
         return
-    rect = _get_ellipse_rect(center, radius_x, radius_y, thickness, angle)
-    color = tuple(color)
-    center = rect.width//2, rect.height//2
-    _cv_ellipse(
-        surface,
-        rect,
-        center=center,
-        radius_x=radius_x, radius_y=radius_y,
-        color=color,
-        thickness=thickness if thickness else -1,
-        angle=angle, start_angle=0, end_angle=360,
-        antialias=antialias
-    )
+    color = Color(color)
+    if (surface.get_alpha() is None or color.a == 255) and not antialias and angle%90 == 0:
+        rect = _get_ellipse_rect(center, radius_x - thickness//2, radius_y - thickness//2, thickness, angle)
+        draw.ellipse(surface, color, rect, thickness)
+    else:
+            
+        rect = _get_ellipse_rect(center, radius_x, radius_y, thickness, angle)
+        color = tuple(color)
+        center = rect.width//2, rect.height//2
+        _cv_ellipse(
+            surface,
+            rect,
+            center=center,
+            radius_x=radius_x, radius_y=radius_y,
+            color=color,
+            thickness=thickness if thickness else -1,
+            angle=angle, start_angle=0, end_angle=360,
+            antialias=antialias
+        )
 
 def arc(
     surface: Surface,
