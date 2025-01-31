@@ -290,11 +290,11 @@ def circle(surface: Surface, center: tuple[int, int], radius: int, color: Color,
     - antialias: bool, specify whether the drawing should use antialiased lines or not.
     """
     if radius <= 1:
-        return surface
+        return
     color = tuple(color)
     rect = _get_ellipse_rect(center, radius, radius, thickness, 0)
     center = radius + thickness//2, radius + thickness//2
-    return _cv_circle(surface, rect=rect, center=center, radius=radius, color=color, thickness=thickness if thickness else -1, antialias=antialias)
+    _cv_circle(surface, rect=rect, center=center, radius=radius, color=color, thickness=thickness if thickness else -1, antialias=antialias)
 
 def ellipse(surface: Surface, center: tuple[int, int], radius_x: int, radius_y: int, color: Color, thickness: int, antialias: bool, angle: int = 0):
     """
@@ -312,11 +312,11 @@ def ellipse(surface: Surface, center: tuple[int, int], radius_x: int, radius_y: 
     - angle: int, in degrees, the angle by which the axis-aligned ellipse will be rotated.
     """
     if radius_x <= 0 or radius_y <= 0:
-        return surface
+        return
     rect = _get_ellipse_rect(center, radius_x, radius_y, thickness, angle)
     color = tuple(color)
     center = rect.width//2, rect.height//2
-    return _cv_ellipse(
+    _cv_ellipse(
         surface,
         rect,
         center=center,
@@ -358,7 +358,7 @@ def arc(
     rect = _get_ellipse_rect(center, radius_x, radius_y, thickness, angle)
     color = tuple(color)
     center = rect.width//2, rect.height//2
-    return _cv_ellipse(
+    _cv_ellipse(
         surface,
         rect,
         center=center,
@@ -401,9 +401,9 @@ def pie(
     if thickness:
         delta = 6//(antialias+1)
         points = list(cv.ellipse2Poly(center, (radius_x, radius_y), angle, start_angle, end_angle, delta)) + [np.array(center).astype(np.int32)]
-        return _cv_lines(surface, points=points, color=color, thickness=thickness, antialias=antialias, closed=True)
+        _cv_lines(surface, points=points, color=color, thickness=thickness, antialias=antialias, closed=True)
     else:
-        return arc(surface, center, radius_x, radius_y, color, thickness, antialias, angle, start_angle, end_angle)
+        arc(surface, center, radius_x, radius_y, color, thickness, antialias, angle, start_angle, end_angle)
 
 def line(surface: Surface, p1: tuple[int, int], p2: tuple[int, int], color: Color, thickness: int, antialias: bool):
     """
@@ -419,7 +419,7 @@ def line(surface: Surface, p1: tuple[int, int], p2: tuple[int, int], color: Colo
     - antialias: bool, specify whether the line should be antialiased or not.
     """
     if thickness <= 0:
-        return surface
+        return
     left = min(p1[0], p2[0]) - thickness//2
     right = max(p1[0], p2[0]) + thickness//2 +1
     top = min(p1[1], p2[1]) - thickness//2
@@ -427,7 +427,7 @@ def line(surface: Surface, p1: tuple[int, int], p2: tuple[int, int], color: Colo
     rect = Rect(left, top, right - left, bottom - top)
     p1 = p1[0] - left, p1[1] - top
     p2 = p2[0] - left, p2[1] - top
-    return _cv_line(surface, rect, p1 = p1, p2 = p2, color=color, thickness=thickness, antialias=antialias)
+    _cv_line(surface, rect, p1 = p1, p2 = p2, color=color, thickness=thickness, antialias=antialias)
 
 def lines(surface: Surface, points: list[tuple[int, int]], color: Color, thickness: int, antialias: bool, closed: bool):
     left = min(point[0] for point in points) - thickness//2
@@ -448,7 +448,7 @@ def lines(surface: Surface, points: list[tuple[int, int]], color: Color, thickne
     - antialias: bool, specify whether the line should be antialiased or not.
     - closed: bool, if True, the first and last points are linked with a line.
     """
-    return _cv_lines(surface, rect, points=points, color=color, thickness=thickness, antialias=antialias, closed=closed)
+    _cv_lines(surface, rect, points=points, color=color, thickness=thickness, antialias=antialias, closed=closed)
 
 def rectangle(surface: Surface, rect: Rect, color: Color, thickness: int):
     """
@@ -465,11 +465,10 @@ def rectangle(surface: Surface, rect: Rect, color: Color, thickness: int):
     color = Color(color)
     if (surface.get_alpha() is None or color.a == 255) and thickness == 0:
         surface.fill(color, rect)
-        return surface
     elif (surface.get_alpha() is None or color.a == 255):
         draw.rect(surface, color, rect, thickness)
-        return surface
-    return _cv_rectangle(surface, rect, color=color, thickness=thickness)
+    else:
+        _cv_rectangle(surface, rect, color=color, thickness=thickness)
 
 def rounded_rectangle(surface: Surface, rect: Rect, color: Color, thickness: int, antialias: bool, top_left: int, top_right: int = None, bottom_left: int = None, bottom_right: int = None,):
     """
@@ -496,9 +495,8 @@ def rounded_rectangle(surface: Surface, rect: Rect, color: Color, thickness: int
         bottom_left = top_left
     if (surface.get_alpha() is None or color.a == 255) and (not antialias or top_right == top_left == bottom_right == bottom_left == 0):
         draw.rect(surface, color, rect, thickness, top_left, top_left, top_right, bottom_left, bottom_right)
-        return surface
     else:
-        return _cv_rounded_rectangle(surface, rect, color=color, thickness=thickness, antialias=antialias,
+        _cv_rounded_rectangle(surface, rect, color=color, thickness=thickness, antialias=antialias,
                                     top_left=top_left, top_right=top_right, bottom_left=bottom_left, bottom_right=bottom_right)
 
 def polygon(surface: Surface, points: list[tuple[int, int]], color: Color, thickness: int, antialias: bool):
@@ -522,6 +520,6 @@ def polygon(surface: Surface, points: list[tuple[int, int]], color: Color, thick
     rect = Rect(left, top, right - left, bottom - top)
     points = [[point[0] - left, point[1] - top] for point in points]
     if thickness:
-        return _cv_lines(surface, rect, points=points, color=color, thickness=thickness, antialias=antialias, closed=True)
+        _cv_lines(surface, rect, points=points, color=color, thickness=thickness, antialias=antialias, closed=True)
     else:
-        return _cv_polygon(surface, rect, points=points, color=color, antialias=antialias)
+        _cv_polygon(surface, rect, points=points, color=color, antialias=antialias)
