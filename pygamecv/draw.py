@@ -54,6 +54,12 @@ def _get_ellipse_rect(center: tuple[int, int], radius_x: int, radius_y: int, thi
         rect = _get_rotated_rect(rect, angle)
     return rect
 
+def _angle_to_cv_angles(start_angle: int, end_angle: int) -> tuple[int, int]:
+    """Transform start and end angle from an anticlockwise drawing expectation to cv's expectaion."""
+    if start_angle < end_angle:
+        return start_angle, end_angle
+    return end_angle, start_angle - 360
+
 @cv_transformation
 def _cv_circle(surf_array: np.ndarray, center: tuple[int, int], radius: int, color: Color, thickness: int, antialias):
     """
@@ -364,10 +370,14 @@ def arc(
     - angle: int, in degrees, the angle by which the axis-aligned ellipse will be rotated.
     - start_angle: int, in degrees, the angle to start drawing.
     - end_angle: int, in degress, the angle to stop drawing.
+    The arc is drawn clockwise from start_angle to end_angle.
     """
+
+    start_angle, end_angle = _angle_to_cv_angles(start_angle, end_angle)
     rect = _get_ellipse_rect(center, radius_x, radius_y, thickness, angle)
     color = tuple(color)
     center = rect.width//2, rect.height//2
+    print(start_angle, end_angle)
     _cv_ellipse(
         surface,
         rect,
@@ -407,7 +417,10 @@ def pie(
     - angle: int, in degrees, the angle by which the axis-aligned ellipse will be rotated.
     - start_angle: int, in degrees, the angle to start drawing.
     - end_angle: int, in degress, the angle to stop drawing.
+    The pie's arc is drawn clockwise from start_angle to end_angle.
     """
+    start_angle, end_angle = _angle_to_cv_angles(start_angle, end_angle)
+
     if thickness:
         delta = 6//(antialias+1)
         points = list(cv.ellipse2Poly(center, (radius_x, radius_y), angle, start_angle, end_angle, delta)) + [np.array(center).astype(np.int32)]

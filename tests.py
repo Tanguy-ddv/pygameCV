@@ -297,10 +297,18 @@ def test_hue(save_dir):
     set_hue(img, mask/2)
     image.save(img, os.path.join(save_dir, "set_huecircle.png"))
 
+def test_angles(save_dir):
+    img, _ = init(save_dir)
+    arc(img, (100, 100), 50, 50, (255, 0, 0, 255), 5, False, 0, 0, 100)
+    arc(img, (100, 100), 50, 50, (0, 255, 0, 255), 5, True, 0, 100, 0)
+    arc(img, (300, 100), 50, 50, (0, 255, 255, 255), 5, True, 0, 0, 0)
+    arc(img, (100, 300), 50, 50, (0, 0, 255, 255), 5, True, 0, 0, 360)
+
+    image.save(img, os.path.join(save_dir, "angles.png"))
 
 save_dir = "test_results"
-test_circle(save_dir)
-test_ellipse(save_dir)
+# test_circle(save_dir)
+# test_ellipse(save_dir)
 # test_arc(save_dir)
 # test_pie(save_dir)
 # test_line(save_dir)
@@ -311,3 +319,4 @@ test_ellipse(save_dir)
 # test_saturatation(save_dir)
 # test_luminosity(save_dir)
 # test_hue(save_dir)
+test_angles(save_dir)
