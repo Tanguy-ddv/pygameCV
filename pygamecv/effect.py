@@ -64,7 +64,7 @@ def _make_factor_and_rect_from_mask(surface: Surface, factor: float | int | np.n
         left, right, top, bottom = _find_first_last_true_indices(factor)
         if any(edge is None for edge in [left, right, top, bottom]):
             return None, None
-        return factor[left: right, top:bottom].swapaxes(0, 1), Rect(left, top, right - left, bottom - top)
+        return np.clip(factor[left: right, top:bottom].swapaxes(0, 1), 0, 1), Rect(left, top, right - left, bottom - top)
 
 @cv_transformation
 def _cv_saturate(rgb_array: np.ndarray, factor: np.ndarray):
@@ -189,6 +189,10 @@ def saturate(surface: Surface, factor: float | np.ndarray):
     if factor is a float, all the surface is saturated by the same factor.
     if factor is a numpy.ndarray, it must have the same shape as the surface.
     In this case, each pixel will be saturated according to the factor.
+
+    Raises:
+    ----
+    - ValueError("This factor has the wrong shape.") if the factor is a numpy.ndarray with a different shape than the surface.
     """
     factor, rect = _make_factor_and_rect_from_mask(surface, factor)
     if not factor is None:
@@ -205,6 +209,10 @@ def desaturate(surface: Surface, factor: float | np.ndarray):
     if factor is a float, all the surface is desaturated by the same factor.
     if factor is a numpy.ndarray, it must have the same shape as the surface.
     In this case, each pixel will be desaturated according to the factor.
+    
+    Raises:
+    ----
+    - ValueError("This factor has the wrong shape.") if the factor is a numpy.ndarray with a different shape than the surface.
     """
     factor, rect = _make_factor_and_rect_from_mask(surface, factor)
     if not factor is None:
@@ -222,10 +230,16 @@ def set_saturation(surface: Surface, value: float | np.ndarray):
     if value is a numpy.ndarray, it must have the same shape as the surface.
     In this case, each pixel's saturation will be set according to the value.
     Saturations are integers between 0 and 255.
+
+    Raises:
+    ----
+    - ValueError("This factor has the wrong shape.") if the factor is a numpy.ndarray with a different shape than the surface.
     """
     if isinstance(value, (float | int)):
         value = np.full(surface.get_size(), value)
-    value = value.swapaxes(0, 1)*255
+    elif value.shape != surface.get_size():
+        raise ValueError("This factor has the wrong shape.")
+    value = np.clip(value, 0, 255).astype(np.int8).swapaxes(0, 1)
     _cv_set_saturation(surface, None, value=value)
 
 def lighten(surface: Surface, factor: float | np.ndarray):
@@ -239,6 +253,10 @@ def lighten(surface: Surface, factor: float | np.ndarray):
     if factor is a float, all the surface is lightened by the same factor.
     if factor is a numpy.ndarray, it must have the same shape as the surface.
     In this case, each pixel will be lightened according to the factor.
+
+    Raises:
+    ----
+    - ValueError("This factor has the wrong shape.") if the factor is a numpy.ndarray with a different shape than the surface.
     """
     factor, rect = _make_factor_and_rect_from_mask(surface, factor)
     if not factor is None:
@@ -255,6 +273,10 @@ def darken(surface: Surface, factor: float | np.ndarray):
     if factor is a float, all the surface is darkened by the same factor.
     if factor is a numpy.ndarray, it must have the same shape as the surface.
     In this case, each pixel will be darkened according to the factor.
+
+    Raises:
+    ----
+    - ValueError("This factor has the wrong shape.") if the factor is a numpy.ndarray with a different shape than the surface.
     """
     factor, rect = _make_factor_and_rect_from_mask(surface, factor)
     if not factor is None:
@@ -272,10 +294,16 @@ def set_luminosity(surface: Surface, value: float | np.ndarray):
     if value is a numpy.ndarray, it must have the same shape as the surface.
     In this case, each pixel's luminosity will be set according to the value.
     Luminosities are integers between 0 and 255.
+
+    Raises:
+    ----
+    - ValueError("This factor has the wrong shape.") if the factor is a numpy.ndarray with a different shape than the surface.
     """
     if isinstance(value, (float | int)):
         value = np.full(surface.get_size(), value)
-    value = value.swapaxes(0, 1)*255
+    elif value.shape != surface.get_size():
+        raise ValueError("This factor has the wrong shape.")
+    value = np.clip(value, 0, 255).astype(np.int8).swapaxes(0, 1)
     _cv_set_luminosity(surface, None, value=value)
 
 def shift_hue(surface: Surface, value: int | np.ndarray):
@@ -307,8 +335,14 @@ def set_hue(surface: Surface, value: int | np.ndarray):
     if value is a numpy.ndarray, it must have the same shape as the surface.
     In this case, each pixel's hue will be set according to the value.
     Hues are integers between 0° and 180°
+
+    Raises:
+    ----
+    - ValueError("This factor has the wrong shape.") if the factor is a numpy.ndarray with a different shape than the surface.
     """
     if isinstance(value, (float | int)):
         value = np.full(surface.get_size(), value)
-    value = value.swapaxes(0, 1)*180
+    elif value.shape != surface.get_size():
+        raise ValueError("This factor has the wrong shape.")
+    value = np.mod(value, 180).swapaxes(0, 1)
     _cv_set_hue(surface, None, value=value)
