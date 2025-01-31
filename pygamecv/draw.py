@@ -74,8 +74,11 @@ def _cv_circle(surf_array: np.ndarray, center: tuple[int, int], radius: int, col
     - thickness: int, the thickness of the draw, following cv's rule.
     - antialias: bool, specify whether the drawing should use antialiased lines or not.
     """
+    color = tuple(color)
+    if len(color) == 3:
+        color = (*color, 255)
     line_type = cv.LINE_AA if antialias else cv.LINE_8
-    cv.circle(surf_array, center, radius, tuple(color), thickness, line_type, 0)
+    cv.circle(surf_array, center, radius, color, thickness, line_type, 0)
 
 @cv_transformation
 def _cv_ellipse(
@@ -103,8 +106,11 @@ def _cv_ellipse(
     - thickness: int, the thickness of the draw, following cv's rule.
     - antialias: bool, specify whether the drawing should use antialiased lines or not.
     """
+    color = tuple(color)
+    if len(color) == 3:
+        color = (*color, 255)
     line_type = cv.LINE_AA if antialias else cv.LINE_8
-    cv.ellipse(surf_array, center, (radius_x, radius_y), angle, start_angle, end_angle, tuple(color), thickness, line_type, 0)
+    cv.ellipse(surf_array, center, (radius_x, radius_y), angle, start_angle, end_angle, color, thickness, line_type, 0)
 
 @cv_transformation
 def _cv_line(
@@ -128,6 +134,8 @@ def _cv_line(
     - antialias: bool, specify whether the line should be antialiased or not.
     """
     color = tuple(color)
+    if len(color) == 3:
+        color = (*color, 255)    
     line_type = cv.LINE_AA if antialias else cv.LINE_8
     overlay = surf_array.copy()
     cv.line(surf_array, p1, p2, tuple(color), thickness, line_type, 0)
@@ -157,6 +165,8 @@ def _cv_lines(
     - closed: bool, if True, the first and last points will be linked by a lines.
     """
     color = tuple(color)
+    if len(color) == 3:
+        color = (*color, 255)
     line_type = cv.LINE_AA if antialias else cv.LINE_8
     pad_left = -min(0, min(point[0] for point in points))
     pad_right = max(0, max(point[0] - surf_array.shape[0] for point in points))
@@ -196,6 +206,8 @@ def _cv_polygon(
     - antialias: bool, specify whether the lines should be antialiased or not.
     """
     color = tuple(color)
+    if len(color) == 3:
+        color = (*color, 255)
     line_type = cv.LINE_AA if antialias else cv.LINE_8
     pad_left = -min(0, min(point[0] for point in points))
     pad_right = max(0, max(point[0] - surf_array.shape[0] for point in points))
@@ -232,6 +244,8 @@ def _cv_rectangle(
     - thickness: int, the thickness of the rectangle.
     """
     color = tuple(color)
+    if len(color) == 3:
+        color = (*color, 255)
     rectangle = np.full(surf_array.shape, np.array(tuple(color)), dtype=np.uint8)
     if thickness != 0:
         innner_shape = surf_array.shape[0] - 2*thickness, surf_array.shape[1] - 2*thickness, surf_array.shape[2]
@@ -264,6 +278,9 @@ def _cv_rounded_rectangle(
     - bottom_right: the radius of the bottom right corner.
     """
     delta = 6//(antialias+1)
+    color = tuple(color)
+    if len(color) == 3:
+        color = (*color, 255)
     line_type = cv.LINE_AA if antialias else cv.LINE_8
     w, h, _ = surf_array.shape
     top_left_points = list(cv.ellipse2Poly((top_left, top_left), (top_left, top_left), 0, 180, 270, delta))
@@ -377,7 +394,6 @@ def arc(
     rect = _get_ellipse_rect(center, radius_x, radius_y, thickness, angle)
     color = tuple(color)
     center = rect.width//2, rect.height//2
-    print(start_angle, end_angle)
     _cv_ellipse(
         surface,
         rect,
