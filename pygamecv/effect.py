@@ -1,9 +1,25 @@
 import cv2 as cv
 from pygame import Surface, Rect
 import numpy as np
-from .decorator import cv_transformation
+from .common import cv_transformation
 
-def _find_first_last_true_indices(arr: np.ndarray):
+def _find_first_last_true_indices(arr: np.ndarray) -> tuple[int | None]:
+    """
+    Find the first and last indices of a non-zero value of a numpy array.
+    
+    Params:
+    ----
+    arr: np.ndarray, the array we explore.
+
+    Returns:
+    ----
+    - first_col: int | None, the index of the first column containing at least one non-zero value.
+    - last_col: int | None, the index of the last column containing at least one non-zero value.
+    - first_row: int | None, the index of the first row containing at least one non-zero value.
+    - last_row: int | None, the index of the last row containing at least one non-zero value.
+
+    If all values inside the array are equal to 0, then each output is set to None.
+    """
 
     # Find the first and last columns with at least one True
     col_indices = np.where(arr.any(axis=0))[0]
@@ -17,7 +33,28 @@ def _find_first_last_true_indices(arr: np.ndarray):
     
     return first_col, last_col, first_row, last_row
 
-def _make_rect_and_factor_from_mask(surface: Surface, factor: float | int | np.ndarray):
+def _make_factor_and_rect_from_mask(surface: Surface, factor: float | int | np.ndarray) -> tuple[np.ndarray | None, Rect | None]:
+    """
+    Create a factor matrix and a Rect based on the mask. The Rect is the smallest Rect containing all non-zero values of the mask.
+
+    Params:
+    ----
+    - surface: pygame.Surface, the surface is used to check the size of the mask and build the submask.
+    It is the surface on which the effect will be applied.
+    - factor: float | int | numpy.ndarray. The factor mask that will be applied to the surface later.
+    If factor is a float or an int, the mask will be a constant matrix of the same shape than the surface.
+    If factor is a numpy.ndarray, it must have the same shape than the surface. This array will be cropped
+    to the smallest rectangle containing all non-zero values.
+
+    Returns:
+    ----
+    - factor: numpy.ndarray | None, the matrix of factors. If None, the input factor was a matrix full of zero
+    - rect: pygame.Rect | None, the rect to be used to subsurface the surface. If None, no subsurface will be done.
+
+    Raises:
+    ----
+    - ValueError("This factor has the wrong shape.") if the factor is a numpy.ndarray with a different shape than the surface.
+    """
     if isinstance(factor, (float | int)):
         factor = np.full(surface.get_size(), factor).swapaxes(0, 1)
         return factor, None
@@ -47,26 +84,6 @@ def _cv_set_saturation(rgb_array: np.ndarray, value: np.ndarray):
     hls_array[:,:, 2] = value
     rgb_array[:, :, :3] = cv.cvtColor(hls_array, cv.COLOR_HLS2RGB)
 
-def saturate(surface: Surface, factor: float | np.ndarray[float]):
-    factor, rect = _make_rect_and_factor_from_mask(surface, factor)
-    if factor is None:
-        return surface
-    else:
-        return _cv_saturate(surface, rect, factor=factor)
-
-def desaturate(surface: Surface, factor: float | np.ndarray[float]):
-    factor, rect = _make_rect_and_factor_from_mask(surface, factor)
-    if factor is None:
-        return surface
-    else:
-        return _cv_desaturate(surface, rect, factor=factor)
-
-def set_saturation(surface: Surface, value: float | np.ndarray):
-    if isinstance(value, (float | int)):
-        value = np.full(surface.get_size(), value)
-    value = value.swapaxes(0, 1)*255
-    return _cv_set_saturation(surface, None, value=value)
-
 @cv_transformation
 def _cv_lighten(rgb_array: np.ndarray, factor: np.ndarray):
     hls_array = cv.cvtColor(rgb_array, cv.COLOR_RGB2HLS)
@@ -85,26 +102,6 @@ def _cv_set_luminosity(rgb_array: np.ndarray, value: np.ndarray):
     hls_array[:,:, 1] = value
     rgb_array[:, :, :3] = cv.cvtColor(hls_array, cv.COLOR_HLS2RGB)
 
-def lighten(surface: Surface, factor: float | np.ndarray[float]):
-    factor, rect = _make_rect_and_factor_from_mask(surface, factor)
-    if factor is None:
-        return surface
-    else:
-        return _cv_lighten(surface, rect, factor=factor)
-
-def darken(surface: Surface, factor: float | np.ndarray[float]):
-    factor, rect = _make_rect_and_factor_from_mask(surface, factor)
-    if factor is None:
-        return surface
-    else:
-        return _cv_darken(surface, rect, factor=factor)
-
-def set_luminosity(surface: Surface, value: float | np.ndarray):
-    if isinstance(value, (float | int)):
-        value = np.full(surface.get_size(), value)
-    value = value.swapaxes(0, 1)*255
-    return _cv_set_luminosity(surface, None, value=value)
-
 @cv_transformation
 def _cv_shift_hue(rgb_array: np.ndarray, factor: np.ndarray):
     hls_array = cv.cvtColor(rgb_array, cv.COLOR_RGB2HLS)
@@ -117,8 +114,48 @@ def _cv_set_hue(rgb_array: np.ndarray, value: np.ndarray):
     hls_array[:,:, 0] = np.mod(value, 180)
     rgb_array[:, :, :3] = cv.cvtColor(hls_array, cv.COLOR_HLS2RGB)
 
+def saturate(surface: Surface, factor: float | np.ndarray[float]):
+    factor, rect = _make_factor_and_rect_from_mask(surface, factor)
+    if factor is None:
+        return surface
+    else:
+        return _cv_saturate(surface, rect, factor=factor)
+
+def desaturate(surface: Surface, factor: float | np.ndarray[float]):
+    factor, rect = _make_factor_and_rect_from_mask(surface, factor)
+    if factor is None:
+        return surface
+    else:
+        return _cv_desaturate(surface, rect, factor=factor)
+
+def set_saturation(surface: Surface, value: float | np.ndarray):
+    if isinstance(value, (float | int)):
+        value = np.full(surface.get_size(), value)
+    value = value.swapaxes(0, 1)*255
+    return _cv_set_saturation(surface, None, value=value)
+
+def lighten(surface: Surface, factor: float | np.ndarray[float]):
+    factor, rect = _make_factor_and_rect_from_mask(surface, factor)
+    if factor is None:
+        return surface
+    else:
+        return _cv_lighten(surface, rect, factor=factor)
+
+def darken(surface: Surface, factor: float | np.ndarray[float]):
+    factor, rect = _make_factor_and_rect_from_mask(surface, factor)
+    if factor is None:
+        return surface
+    else:
+        return _cv_darken(surface, rect, factor=factor)
+
+def set_luminosity(surface: Surface, value: float | np.ndarray):
+    if isinstance(value, (float | int)):
+        value = np.full(surface.get_size(), value)
+    value = value.swapaxes(0, 1)*255
+    return _cv_set_luminosity(surface, None, value=value)
+
 def shift_hue(surface: Surface, factor: float | np.ndarray[float]):
-    factor, rect = _make_rect_and_factor_from_mask(surface, factor)
+    factor, rect = _make_factor_and_rect_from_mask(surface, factor)
     if factor is None:
         return surface
     else:
