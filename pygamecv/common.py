@@ -51,9 +51,8 @@ def cv_transformation(func: Callable[[np.ndarray], None]):
             new_surf = make_surface_rgba(array_surf.swapaxes(1, 0))
 
         if rect is None:
-            return new_surf
+            return surface.blit(new_surf, (0,0))
 
         surface.blit(new_surf, rect)
-        return surface
     
     return wrapper_cv
