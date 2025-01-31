@@ -22,12 +22,12 @@ def _find_first_last_true_indices(arr: np.ndarray) -> tuple[int | None]:
     """
 
     # Find the first and last columns with at least one True
-    col_indices = np.where(arr.any(axis=0))[0]
+    col_indices = np.where(arr.any(axis=1))[0]
     first_col = col_indices[0] if col_indices.size > 0 else None
     last_col = col_indices[-1] if col_indices.size > 0 else None
     
     # Find the first and last rows with at least one True
-    row_indices = np.where(arr.any(axis=1))[0]
+    row_indices = np.where(arr.any(axis=0))[0]
     first_row = row_indices[0] if row_indices.size > 0 else None
     last_row = row_indices[-1] if row_indices.size > 0 else None
     
@@ -64,7 +64,7 @@ def _make_factor_and_rect_from_mask(surface: Surface, factor: float | int | np.n
         left, right, top, bottom = _find_first_last_true_indices(factor)
         if any(edge is None for edge in [left, right, top, bottom]):
             return None, None
-        return np.clip(factor[left: right, top:bottom].swapaxes(0, 1), 0, max_factor_value), Rect(left, top, right - left, bottom - top)
+        return np.clip(factor[left: right+1, top:bottom+1].swapaxes(0, 1), 0, max_factor_value), Rect(left, top, right - left+1, bottom - top+1)
 
 @cv_transformation
 def _cv_saturate(rgb_array: np.ndarray, factor: np.ndarray):

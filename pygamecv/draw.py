@@ -283,10 +283,10 @@ def _cv_rounded_rectangle(
         color = (*color, 255)
     line_type = cv.LINE_AA if antialias else cv.LINE_8
     w, h, _ = surf_array.shape
-    top_left_points = list(cv.ellipse2Poly((top_left, top_left), (top_left, top_left), 0, 180, 270, delta))
-    top_right_points = list(cv.ellipse2Poly((h - top_right, top_right), (top_right, top_right), 0, 0, -90, delta))
-    bottom_right_points = list(cv.ellipse2Poly((h - bottom_right, w - bottom_right), (bottom_right, bottom_right), 0, 0, 90, delta))
-    bottom_left_points = list(cv.ellipse2Poly((bottom_left, w - bottom_left), (bottom_left, bottom_left), 0, 90, 180, delta))
+    top_left_points = list(cv.ellipse2Poly((top_left + thickness//2, top_left + thickness//2), (top_left, top_left), 0, 180, 270, delta))
+    top_right_points = list(cv.ellipse2Poly((h - top_right - thickness//2, top_right + thickness//2), (top_right, top_right), 0, 0, -90, delta))
+    bottom_right_points = list(cv.ellipse2Poly((h - bottom_right - thickness//2, w - bottom_right - thickness//2), (bottom_right, bottom_right), 0, 0, 90, delta))
+    bottom_left_points = list(cv.ellipse2Poly((bottom_left + thickness//2, w - bottom_left - thickness//2), (bottom_left, bottom_left), 0, 90, 180, delta))
     points = np.array(top_left_points + top_right_points + bottom_right_points + bottom_left_points)
     overlay = surf_array.copy()
     points = points.reshape((-1, 1, 2))  # Shape it into (n, 1, 2)
@@ -535,6 +535,7 @@ def rounded_rectangle(surface: Surface, rect: Rect, color: Color, thickness: int
     if (surface.get_alpha() is None or color.a == 255) and (not antialias or top_right == top_left == bottom_right == bottom_left == 0):
         draw.rect(surface, color, rect, thickness, top_left, top_left, top_right, bottom_left, bottom_right)
     else:
+        rect = Rect(rect)
         _cv_rounded_rectangle(surface, rect, color=color, thickness=thickness, antialias=antialias,
                                     top_left=top_left, top_right=top_right, bottom_left=bottom_left, bottom_right=bottom_right)
 

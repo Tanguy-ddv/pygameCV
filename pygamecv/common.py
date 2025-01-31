@@ -21,6 +21,7 @@ def cv_transformation(func: Callable[[np.ndarray], None]):
         if rect is None:
             subsurf = surface
         else:
+            rect = Rect(rect)
             if not rect.colliderect(surface.get_rect()):
                 return surface
 
@@ -38,6 +39,7 @@ def cv_transformation(func: Callable[[np.ndarray], None]):
                 subsurf.blit(surface, target_position, overlap_rect)
 
         if alpha is None: # the image does not have any alpha channel.
+            subsurf = subsurf.convert(24)
             array_surf = (sa.pixels3d(subsurf)).swapaxes(1, 0)
             func(array_surf, **kwargs)
             new_surf = sa.make_surface(array_surf.swapaxes(1, 0))
