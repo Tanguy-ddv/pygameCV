@@ -216,12 +216,12 @@ Which removes the color saturation of the center, like that:
 ### Other needs
 
 You are telling me that now, you what to other cv functions. For that, you will need to define your own function,
-using the decorator ```pygamecv.common.cv_transformation```. This decorator transform a cv function
+using the decorator ``pygamecv.common.cv_transformation``. This decorator transform a cv function
 into a pygame surface transformation.
 
 Here, _cv_your_function transforms in-place img.
 The decorator turn it from an in-place array to array into an in-place surface-to-surface transformation, with a rect argument.
-If the rect is specified, the array to be transformed is taken from a subsurface, extracted by the rect. Otherwise, it is from the whole surface. 
+If the rect is specified, the array to be transformed is taken from a subsurface, extracted by the rect. Otherwise, it is from the whole surface.
 Then, you can define another function to call it. It is adviced to do so if you need to compute a rectangle from the input of the function, that's how it is done for circles or ellipses, for example.
 
 ```python
@@ -237,11 +237,11 @@ Then, you can define another function to call it. It is adviced to do so if you 
     @pygamecv.cv_transformation
     def _cv_your_function(img: numpy.ndarray, **kwargs):
         ...
-    
+  
     def your_function(surface: pygame.Surface, **kwargs):
         rect = ...
         _cv_your_function(surface, rect, **kwargs)
-    
+  
     your_function(img, (11, 11), 20)
 
 ```
@@ -252,9 +252,12 @@ Modify a Surface using cv may be long, as copying the value of the pixels needs 
 
 ## Contributing
 
-Everyone is welcome to contribute to this project by proposing new features and optimizations! Your feedbacks will be appreciated.
+Everyone is welcome to contribute to this project by proposing new features, optimization and help with the documentation! Your feedbacks will be appreciated.
 
 ## License
 
 This project is licensed under a GNU GENERAL PUBLIC LICENSE, please refer to [the license file](LICENSE)
 
+## Documentation
+
+PygameCV's full documentation can be found [here](https://pygamecv.readthedocs.io/en/latest/)
