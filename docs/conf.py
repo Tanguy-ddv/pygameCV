@@ -30,3 +30,10 @@ source_suffix = {
 master_doc = 'README'
 
 autosummary_generate = True
+
+html_sidebars = {
+    '**': [
+        'navigation.html',  # Include this to show the default navigation sidebar
+        'searchbox.html',
+    ],
+}
