@@ -3,9 +3,9 @@ import sys
 sys.path.insert(0, os.path.abspath(".."))  # Ensure the project root is in the path
 
 # Project information
-project = 'YourProjectName'
-copyright = '2025, Your Name'
-author = 'Your Name'
+project = 'PygameCV'
+copyright = '2025, Tanguy Dugas du Villard'
+author = 'Tanguy Dugas du Villard'
 
 # General configuration
 extensions = [
@@ -27,11 +27,6 @@ source_suffix = {
     '.rst': 'restructuredtext',
     '.md': 'markdown',
 }
-master_doc = 'README'
-
-# Project information
-project = "PygameCV"
-author = 'Joe Bloggs'
-# author = "Tanguy Dugas du Villard"
+master_doc = 'README.md'
 
 autosummary_generate = True
