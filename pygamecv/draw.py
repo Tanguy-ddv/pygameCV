@@ -469,12 +469,6 @@ def line(surface: Surface, p1: tuple[int, int], p2: tuple[int, int], color: Colo
     _cv_line(surface, rect, p1 = p1, p2 = p2, color=color, thickness=thickness, antialias=antialias)
 
 def lines(surface: Surface, points: list[tuple[int, int]], color: Color, thickness: int, antialias: bool, closed: bool):
-    left = min(point[0] for point in points) - thickness//2
-    right = max(point[0] for point in points) + thickness//2 +1
-    top = min(point[1] for point in points) - thickness//2
-    bottom = max(point[1] for point in points) + thickness//2 + 1
-    rect = Rect(left, top, right - left, bottom - top)
-    points = [[point[0] - left, point[1] - top] for point in points]
     """
     Draw several lines on a pygame.Surface using cv. It is faster than drawing multiple lines one by one.
 
@@ -487,6 +481,12 @@ def lines(surface: Surface, points: list[tuple[int, int]], color: Color, thickne
     - antialias: bool, specify whether the line should be antialiased or not.
     - closed: bool, if True, the first and last points are linked with a line.
     """
+    left = min(point[0] for point in points) - thickness//2
+    right = max(point[0] for point in points) + thickness//2 +1
+    top = min(point[1] for point in points) - thickness//2
+    bottom = max(point[1] for point in points) + thickness//2 + 1
+    rect = Rect(left, top, right - left, bottom - top)
+    points = [[point[0] - left, point[1] - top] for point in points]
     _cv_lines(surface, rect, points=points, color=color, thickness=thickness, antialias=antialias, closed=closed)
 
 def rectangle(surface: Surface, rect: Rect, color: Color, thickness: int):
