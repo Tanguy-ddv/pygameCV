@@ -12,6 +12,7 @@ extensions = [
     'sphinx.ext.autodoc',  # Use docstrings for documentation
     'sphinx.ext.napoleon',  # Support for Google-style and NumPy-style docstrings
     'myst_parser'  # Enable Markdown support
+    "sphinx.ext.autosummary", # Enable auto summary with docstrings.
 ]
 
 templates_path = ['_templates']
@@ -31,3 +32,5 @@ master_doc = 'README'
 # Project information
 project = "PygameCV" 
 author = "Tanguy Dugas du Villard"
+
+autosummary_generate = True
