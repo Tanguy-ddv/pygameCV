@@ -50,7 +50,7 @@ You can now use pygamecv on your surfaces! For example, to draw an ellipse:
 
 Which produces:
 
-.. image:: images/ellipse.png
+.. image:: ../images/ellipse.png
 
 To draw a rectangle with transparency:
 
@@ -63,7 +63,7 @@ To draw a rectangle with transparency:
         thickness=0
     )
 
-.. image:: images/rectangle.png
+.. image:: ../images/rectangle.png
 
 For rounded, antialiased corners:
 
@@ -79,7 +79,7 @@ For rounded, antialiased corners:
         bottom_right=135,
     )
 
-.. image:: images/rounded_rectangle.png
+.. image:: ../images/rounded_rectangle.png
 
 Effect
 ------
@@ -93,7 +93,7 @@ To saturate an image:
         factor=1
     )
 
-.. image:: images/saturation.png
+.. image:: ../images/saturation.png
 
 To shift the hue and darken an image:
 
@@ -102,7 +102,7 @@ To shift the hue and darken an image:
     pygamecv.shift_hue(surface=img, value=90)
     pygamecv.darken(surface=img, factor=0.5)
 
-.. image:: images/darken_shift_hue.png
+.. image:: ../images/darken_shift_hue.png
 
 For a vignette effect using a NumPy gradient:
 
@@ -122,7 +122,7 @@ For a vignette effect using a NumPy gradient:
     factor = gradient_factor(*img.get_size(), min_radius=50)
     pygamecv.darken(surface=img, factor=factor)
 
-.. image:: images/circle_darkened.png
+.. image:: ../images/circle_darkened.png
 
 To set saturation outside of a circle using a mask:
 
@@ -136,7 +136,7 @@ To set saturation outside of a circle using a mask:
     mask = circle_mask(*img.get_size(), 100)
     pygamecv.set_saturation(surface=img, value=0, mask=mask)
 
-.. image:: images/circle_saturation.png
+.. image:: ../images/circle_saturation.png
 
 Other Needs
 -----------
