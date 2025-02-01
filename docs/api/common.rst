@@ -1,7 +1,7 @@
 Common tools
 ==============
 
-.. automodule:: pygamecv.pygamecv.common
+.. automodule:: pygamecv.common
    :members:
    :undoc-members:
    :show-inheritance:

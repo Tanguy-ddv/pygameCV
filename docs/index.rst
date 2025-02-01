@@ -5,7 +5,9 @@ Welcome to PygameCV's Documentation!
    :maxdepth: 2
    :caption: Contents:
 
-   readme
-   api/drawing
-   api/effects
-   api/masks
+   api/draw
+   api/effect
+   api/common
+
+.. include:: ../README.md
+   :parser: myst_parser

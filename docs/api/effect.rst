@@ -1,7 +1,7 @@
 Effects
 ==============
 
-.. automodule:: pygamecv.pygamecv.effect
+.. automodule:: pygamecv.effect
    :members:
    :undoc-members:
    :show-inheritance:
