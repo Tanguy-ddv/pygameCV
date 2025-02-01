@@ -11,7 +11,7 @@ author = 'Your Name'
 extensions = [
     'sphinx.ext.autodoc',  # Use docstrings for documentation
     'sphinx.ext.napoleon',  # Support for Google-style and NumPy-style docstrings
-    'myst_parser'  # Enable Markdown support
+    'myst_parser',  # Enable Markdown support
     "sphinx.ext.autosummary", # Enable auto summary with docstrings.
 ]
 
