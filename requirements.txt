@@ -1,0 +1,4 @@
+myst-parser
+opencv-python
+numpy
+pygame
