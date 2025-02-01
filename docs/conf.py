@@ -27,6 +27,6 @@ source_suffix = {
     '.rst': 'restructuredtext',
     '.md': 'markdown',
 }
-master_doc = 'README.md'
+master_doc = 'README'
 
 autosummary_generate = True
