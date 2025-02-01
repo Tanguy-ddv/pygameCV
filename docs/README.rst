@@ -48,10 +48,6 @@ You can now use pygamecv on your surfaces! For example, to draw an ellipse:
     )
     ... # The remaining of your game.
 
-Which produces:
-
-.. image:: ../images/ellipse.png
-
 To draw a rectangle with transparency:
 
 .. code-block:: python
@@ -62,8 +58,6 @@ To draw a rectangle with transparency:
         color=(0, 255, 255, 100),
         thickness=0
     )
-
-.. image:: ../images/rectangle.png
 
 For rounded, antialiased corners:
 
@@ -79,8 +73,6 @@ For rounded, antialiased corners:
         bottom_right=135,
     )
 
-.. image:: ../images/rounded_rectangle.png
-
 Effect
 ------
 
@@ -93,8 +85,6 @@ To saturate an image:
         factor=1
     )
 
-.. image:: ../images/saturation.png
-
 To shift the hue and darken an image:
 
 .. code-block:: python
@@ -102,7 +92,6 @@ To shift the hue and darken an image:
     pygamecv.shift_hue(surface=img, value=90)
     pygamecv.darken(surface=img, factor=0.5)
 
-.. image:: ../images/darken_shift_hue.png
 
 For a vignette effect using a NumPy gradient:
 
@@ -122,8 +111,6 @@ For a vignette effect using a NumPy gradient:
     factor = gradient_factor(*img.get_size(), min_radius=50)
     pygamecv.darken(surface=img, factor=factor)
 
-.. image:: ../images/circle_darkened.png
-
 To set saturation outside of a circle using a mask:
 
 .. code-block:: python
@@ -136,8 +123,6 @@ To set saturation outside of a circle using a mask:
     mask = circle_mask(*img.get_size(), 100)
     pygamecv.set_saturation(surface=img, value=0, mask=mask)
 
-.. image:: ../images/circle_saturation.png
-
 Other Needs
 -----------
 
@@ -149,25 +134,20 @@ To define your own OpenCV function and use it with pygamecv:
     
     @pygamecv.cv_transformation
     def _cv_your_function(img: np.ndarray, **kwargs):
-        ...
+        ... # an in place array-modificating function
     
     def your_function(surface: pygame.Surface, **kwargs):
         rect = ...
         _cv_your_function(surface, rect, **kwargs)
     
-    your_function(img, (11, 11), 20)
+    your_function(img, kwarg1=(11, 11), kwarg2=20)
 
 Warning
 -------
 
 Modifying a Surface using OpenCV may be slow, as copying pixel values needs to be done twice. To optimize, restrict the modified area using the smallest `Rect` possible.
 
-Contributing
-------------
+Repo
+------
 
-Everyone is welcome to contribute to this project by proposing new features and optimizations! Your feedback is appreciated.
-
-License
--------
-
-This project is licensed under a **GNU GENERAL PUBLIC LICENSE**. Please refer to the :download:`license file <LICENSE>`.
+The project is hosted at <https://github.com/Tanguy-ddv/pygameCV>

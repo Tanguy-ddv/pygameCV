@@ -27,3 +27,7 @@ source_suffix = {
     '.md': 'markdown',
 }
 master_doc = 'README'
+
+# Project information
+project = "PygameCV" 
+author = "Tanguy Dugas du Villard"
