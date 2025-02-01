@@ -9,5 +9,4 @@ Welcome to PygameCV's Documentation!
    api/effect
    api/common
 
-.. include:: ../README.md
-   :parser: myst_parser
+.. include:: README.rst
