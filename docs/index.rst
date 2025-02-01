@@ -8,4 +8,5 @@ Welcome to PygameCV's documentation!
    :maxdepth: 2
    :caption: Contents:
 
-   readme
+   .. include:: README.rst
+      :parser: myst_parser.sphinx_
