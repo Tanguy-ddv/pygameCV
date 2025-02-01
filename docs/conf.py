@@ -30,7 +30,8 @@ source_suffix = {
 master_doc = 'README'
 
 # Project information
-project = "PygameCV" 
-author = "Tanguy Dugas du Villard"
+project = "PygameCV"
+author = 'Joe Bloggs'
+# author = "Tanguy Dugas du Villard"
 
 autosummary_generate = True
