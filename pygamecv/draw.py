@@ -542,8 +542,29 @@ def rounded_rectangle(surface: Surface, rect: Rect, color: Color, thickness: int
     rect.top -= thickness//2
     rect.width += thickness
     rect.height += thickness
-    if (surface.get_alpha() is None or color.a == 255) and (not antialias or top_right == top_left == bottom_right == bottom_left == 0):
+    if any( # If one of these conditions is satisfied, then pygame draws a quarter of circle that would be outside of the final rounded rect
+        # Think if top_right = bottom_left = 100, bottom_right = top_left = 0, and width = height = 100.
+            top_right + top_left <= rect.width,
+            bottom_left + bottom_right <= rect.width,
+            top_right + bottom_right <= rect.height,
+            top_left + bottom_left <= rect.height,
+        ):
+            raise ValueError(f"""
+                The specified radii cannot be used to draw as the cumulated radii is above
+                the width or height, got {top_right}, {top_left}, {bottom_right}, {bottom_left}
+                for a size of {rect.width, rect.height}."""
+        )
 
+    if ((surface.get_alpha() is None or color.a == 255) # there is no alpha component in the drawing
+        and (not antialias or top_right == top_left == bottom_right == bottom_left == 0) # and there is no antialias or we don't care about it
+        and ( # If one of these conditions is satisfied, then pygame draws a quarter of circle that would be outside of the final rounded rect
+        # Think if top_right = bottom_left = 100, bottom_right = top_left = 0, and width = height = 100.
+            top_right + top_left <= rect.width//2
+            and bottom_left + bottom_right <= rect.width//2
+            and top_right + bottom_right <= rect.height//2
+            and top_left + bottom_left <= rect.height//2
+        )
+        ):
         draw.rect(surface, color, rect, thickness, top_left, top_left, top_right, bottom_left, bottom_right)
     else:
         rect = Rect(rect)

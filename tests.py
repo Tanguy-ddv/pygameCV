@@ -16,6 +16,12 @@ def init(save_dir):
 def test_circle(save_dir):
     img, img_alpha = init(save_dir)
     circle(img, (100, 200), 100, (255, 255, 0, 255), 50, False)
+    circle(img, (100, 200), 100, (100, 100, 0, 155), 50, True)
+    rect = Rect(0, 0, 250, 250)
+    rect.center = (100, 200)
+    draw.rect(img, (0, 0, 0, 255), rect, width=2)
+    draw.circle(img, (255, 255, 255, 255), (100, 200), 5)
+
     circle(img, (200, 100), 100, (255, 0, 0, 255), 0, False)
     circle(img, (300, 300), 70, (0, 255, 0, 255), 50, False)
     circle(img, (400, 150), 100, (255, 0, 255, 255), 0, True)
@@ -132,7 +138,7 @@ def test_rounded_rectangle(save_dir):
     rounded_rectangle(img, Rect((0, 0),  (200, 300)), (255, 255, 0, 255), 10, True, 50)
     rounded_rectangle(img, Rect((200, 100), (50, 50)), (255, 0, 0, 255), 5, True, 0)
     rounded_rectangle(img, Rect((300, 300), (10, 10)), (0, 255, 0, 255), 0, False, 10, 10, 20, 20)
-    rounded_rectangle(img, Rect((200, 150), (200, 200)), (255, 0, 255, 255), 0, True, 100, 0, 0, 100)
+    rounded_rectangle(img, Rect((200, 150), (200, 200)), (255, 0, 255, 255), 0, False, 200, 0, 0, 200)
 
     rounded_rectangle(img_alpha, Rect((100, 200),  (200, 300)), (255, 255, 0, 50), 0, True, 100)
     rounded_rectangle(img_alpha, Rect((200, 100), (50, 50)), (255, 0, 0, 255), 5, True, 0)
