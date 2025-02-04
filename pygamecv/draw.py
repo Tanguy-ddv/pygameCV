@@ -316,7 +316,7 @@ def circle(surface: Surface, center: tuple[int, int], radius: int, color: Color,
         return
     color = Color(color)
     if (surface.get_alpha() is None or color.a == 255) and not antialias:
-        draw.circle(surface, color, center, radius, thickness)
+        draw.circle(surface, color, center, radius + thickness//2, thickness)
     else:
         color = tuple(color)
         rect = _get_ellipse_rect(center, radius, radius, thickness, 0)
