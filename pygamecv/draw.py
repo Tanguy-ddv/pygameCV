@@ -542,13 +542,15 @@ def rounded_rectangle(surface: Surface, rect: Rect, color: Color, thickness: int
     rect.top -= thickness//2
     rect.width += thickness
     rect.height += thickness
-    if any( # If one of these conditions is satisfied, then pygame draws a quarter of circle that would be outside of the final rounded rect
+    if any(
+        ( # If one of these conditions is satisfied, then pygame draws a quarter of circle that would be outside of the final rounded rect
         # Think if top_right = bottom_left = 100, bottom_right = top_left = 0, and width = height = 100.
-            top_right + top_left <= rect.width,
-            bottom_left + bottom_right <= rect.width,
-            top_right + bottom_right <= rect.height,
-            top_left + bottom_left <= rect.height,
-        ):
+            top_right + top_left > rect.width,
+            bottom_left + bottom_right > rect.width,
+            top_right + bottom_right > rect.height,
+            top_left + bottom_left > rect.height,
+        )
+    ):
             raise ValueError(f"""
                 The specified radii cannot be used to draw as the cumulated radii is above
                 the width or height, got {top_right}, {top_left}, {bottom_right}, {bottom_left}

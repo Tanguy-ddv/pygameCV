@@ -137,12 +137,16 @@ def test_rounded_rectangle(save_dir):
     img, img_alpha = init(save_dir)
     rounded_rectangle(img, Rect((0, 0),  (200, 300)), (255, 255, 0, 255), 10, True, 50)
     rounded_rectangle(img, Rect((200, 100), (50, 50)), (255, 0, 0, 255), 5, True, 0)
-    rounded_rectangle(img, Rect((300, 300), (10, 10)), (0, 255, 0, 255), 0, False, 10, 10, 20, 20)
+    try: rounded_rectangle(img, Rect((300, 300), (10, 10)), (0, 255, 0, 255), 0, False, 10, 10, 20, 20)
+    except ValueError: print('wrong radii catched')
+    else: print('wrong radii not catched')
     rounded_rectangle(img, Rect((200, 150), (200, 200)), (255, 0, 255, 255), 0, False, 200, 0, 0, 200)
 
     rounded_rectangle(img_alpha, Rect((100, 200),  (200, 300)), (255, 255, 0, 50), 0, True, 100)
     rounded_rectangle(img_alpha, Rect((200, 100), (50, 50)), (255, 0, 0, 255), 5, True, 0)
-    rounded_rectangle(img_alpha, Rect((300, 300), (10, 10)), (0, 255, 0, 255), 0, False, 10, 10, 20, 20)
+    try: rounded_rectangle(img_alpha, Rect((300, 300), (10, 10)), (0, 255, 0, 255), 0, False, 10, 10, 20, 20)
+    except ValueError: print('wrong radii catched')
+    else: print('wrong radii not catched')
     rounded_rectangle(img_alpha, Rect((200, 150), (200, 200)), (255, 0, 255, 200), 0, True, 100, 0, 0, 100)
 
     draw.rect(img_alpha, (0, 0, 0, 255), Rect((100, 200),  (200, 300)), 10)
