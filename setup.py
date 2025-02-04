@@ -4,7 +4,7 @@ setup(
     name='pygame-cv',
     author="Tanguy Dugas du Villard",
     author_mail="tanguy.dugas01@gmail.com",
-    version='1.3.0',
+    version='1.3.1',
     description="PygameCV module is a set of functions helping game developpers using pygame to apply some transformations on their surfaces using CV.",
     packages=find_packages(),
     install_requires=[
