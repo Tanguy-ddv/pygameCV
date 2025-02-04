@@ -460,10 +460,10 @@ def line(surface: Surface, p1: tuple[int, int], p2: tuple[int, int], color: Colo
     if thickness <= 0:
         return
     left = min(p1[0], p2[0]) - thickness//2
-    right = max(p1[0], p2[0]) + thickness//2 +1
+    right = max(p1[0], p2[0]) + thickness//2 
     top = min(p1[1], p2[1]) - thickness//2
-    bottom = max(p1[1], p2[1]) + thickness//2 + 1
-    rect = Rect(left, top, right - left, bottom - top)
+    bottom = max(p1[1], p2[1]) + thickness//2
+    rect = Rect(left, top, right - left + 1, bottom - top + 1)
     p1 = p1[0] - left, p1[1] - top
     p2 = p2[0] - left, p2[1] - top
     _cv_line(surface, rect, p1 = p1, p2 = p2, color=color, thickness=thickness, antialias=antialias)
@@ -482,10 +482,10 @@ def lines(surface: Surface, points: list[tuple[int, int]], color: Color, thickne
     - closed: bool, if True, the first and last points are linked with a line.
     """
     left = min(point[0] for point in points) - thickness//2
-    right = max(point[0] for point in points) + thickness//2 +1
+    right = max(point[0] for point in points) + thickness//2
     top = min(point[1] for point in points) - thickness//2
-    bottom = max(point[1] for point in points) + thickness//2 + 1
-    rect = Rect(left, top, right - left, bottom - top)
+    bottom = max(point[1] for point in points) + thickness//2
+    rect = Rect(left, top, right - left + 1, bottom - top + 1)
     points = [[point[0] - left, point[1] - top] for point in points]
     _cv_lines(surface, rect, points=points, color=color, thickness=thickness, antialias=antialias, closed=closed)
 
@@ -496,12 +496,17 @@ def rectangle(surface: Surface, rect: Rect, color: Color, thickness: int):
     Params:
     ----
     - surface: pygame.Surface, the surface on which the line is drawn.
-    - rect: pygame.Rect, the rectangle delimitting the drawing.
+    - rect: pygame.Rect, the rectangle representing the center line of the drawing (the drawing is extended in case of thickness)
     - color: pygame.Color, the color of the line.
     - thickness: int, the thickness of the draw. If thickness == 0, the rectangle is filled, else, it is a thick line.
     - antialias: bool, specify whether the line should be antialiased or not.
     """
     color = Color(color)
+    rect = Rect(rect)
+    rect.left -= thickness//2
+    rect.top -= thickness//2
+    rect.width += thickness
+    rect.height += thickness
     if (surface.get_alpha() is None or color.a == 255) and thickness == 0:
         surface.fill(color, rect)
     elif (surface.get_alpha() is None or color.a == 255):
@@ -516,7 +521,7 @@ def rounded_rectangle(surface: Surface, rect: Rect, color: Color, thickness: int
     Params:
     ----
     - surface: pygame.Surface, the surface on which the line is drawn.
-    - rect: pygame.Rect, the rectangle delimitting the drawing.
+    - rect: pygame.Rect, the rectangle representing the center line of the drawing (the drawing is extended in case of thickness)
     - color: pygame.Color, the color of the line.
     - thickness: int, the thickness of the draw. If thickness == 0, the rectangle is filled, else, it is a thick line.
     - antialias: bool, specify whether the line should be antialiased or not.
@@ -532,7 +537,13 @@ def rounded_rectangle(surface: Surface, rect: Rect, color: Color, thickness: int
         bottom_right = top_left
     if bottom_left is None:
         bottom_left = top_left
+    rect = Rect(rect)
+    rect.left -= thickness//2
+    rect.top -= thickness//2
+    rect.width += thickness
+    rect.height += thickness
     if (surface.get_alpha() is None or color.a == 255) and (not antialias or top_right == top_left == bottom_right == bottom_left == 0):
+
         draw.rect(surface, color, rect, thickness, top_left, top_left, top_right, bottom_left, bottom_right)
     else:
         rect = Rect(rect)

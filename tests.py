@@ -114,7 +114,7 @@ def test_lines(save_dir):
 
 def test_rectangle(save_dir):
     img, img_alpha = init(save_dir)
-    rectangle(img, Rect((100, 200),  (200, 300)), (255, 255, 0, 255), 50)
+    rectangle(img, Rect((0, 0),  (200, 300)), (255, 255, 0, 255), 50)
     rectangle(img, Rect((200, 100), (50, 50)), (255, 0, 0, 255), 5)
     rectangle(img, Rect((300, 300), (10, 10)), (0, 255, 0, 255), 0)
     rectangle(img, Rect((400, 150), (400, 400)), (255, 0, 255, 255), 0)
@@ -129,7 +129,7 @@ def test_rectangle(save_dir):
 
 def test_rounded_rectangle(save_dir):
     img, img_alpha = init(save_dir)
-    rounded_rectangle(img, Rect((100, 200),  (200, 300)), (255, 255, 0, 255), 0, True, 50)
+    rounded_rectangle(img, Rect((0, 0),  (200, 300)), (255, 255, 0, 255), 10, True, 50)
     rounded_rectangle(img, Rect((200, 100), (50, 50)), (255, 0, 0, 255), 5, True, 0)
     rounded_rectangle(img, Rect((300, 300), (10, 10)), (0, 255, 0, 255), 0, False, 10, 10, 20, 20)
     rounded_rectangle(img, Rect((200, 150), (200, 200)), (255, 0, 255, 255), 0, True, 100, 0, 0, 100)
@@ -432,7 +432,8 @@ save_dir = "test_results"
 # test_pie(save_dir)
 # test_line(save_dir)
 # test_lines(save_dir)
-# test_rounded_rectangle(save_dir)
+# test_rectangle(save_dir)
+test_rounded_rectangle(save_dir)
 # test_polygon(save_dir)
 # test_circle_mask(15, 7)
 # test_saturatation(save_dir)
@@ -440,5 +441,5 @@ save_dir = "test_results"
 # test_hue(save_dir)
 save_dir = "images"
 
-demo(save_dir)
+# demo(save_dir)
 
